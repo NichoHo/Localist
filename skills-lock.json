@@ -1,0 +1,11 @@
+{
+  "version": 1,
+  "skills": {
+    "livewire-development": {
+      "source": "laravel/boost",
+      "sourceType": "github",
+      "skillPath": "tests/Fixtures/vendor-skills/livewire-development/SKILL.md",
+      "computedHash": "1aa270613f86f776a4aa042623051841e10ce926bf3afa9401d530f97613c285"
+    }
+  }
+}
