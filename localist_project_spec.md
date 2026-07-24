@@ -87,45 +87,65 @@ Relationships: a Business belongs to a Category, a City, a Plan, and optionally 
 
 ## 5. Design system
 
-Brand-neutral, trustworthy, directory-appropriate. Swap the accent hue if you want a different personality; keep the neutrals.
+A calm, high-trust marketplace system (refined 2026). Identity stays teal; depth comes from **surface-level shift** (a faintly tinted canvas under pure-white surfaces) and **hairline elevation borders**, not heavy shadows. Tokens live as CSS variables in `resources/css/app.css` and are exposed to Tailwind v4 utilities via `@theme inline`, so every value switches automatically with `prefers-color-scheme`. Pattern: *Marketplace / Directory* (search is the CTA). Style lineage: Swiss-modern structure, human warmth.
 
 ### Color tokens
 
+Neutral surface scale (cool-tinted). Utility = the Tailwind class stem, e.g. `bg-surface`, `text-ink`, `border-line`.
+
 | Token | Light | Dark | Use |
 |---|---|---|---|
-| `--bg` | `#ffffff` | `#0f1419` | Page background |
-| `--surface` | `#f7f8fa` | `#1a2029` | Cards, panels |
-| `--border` | `#e4e7ec` | `#2a323d` | Dividers, card edges |
-| `--text` | `#1a2029` | `#e8eaed` | Body text |
-| `--text-muted` | `#667085` | `#98a2b3` | Secondary text |
-| `--primary` | `#0f766e` | `#2dd4bf` | Links, primary buttons (teal) |
-| `--primary-hover` | `#0d5f58` | `#14b8a6` | Hover states |
-| `--accent` | `#f59e0b` | `#fbbf24` | Featured badges, highlights |
-| `--success` | `#12b76a` | `#32d583` | "Open now", confirmations |
-| `--danger` | `#f04438` | `#f97066` | Errors, destructive actions |
+| `canvas` | `#f6f8f9` | `#0a1417` | Page background |
+| `canvas-2` | `#eef2f4` | `#0e1a1e` | Alternating section bands, footer |
+| `surface` | `#ffffff` | `#131e22` | Cards, panels — float above canvas |
+| `sunken` | `#edf1f3` | `#0c1519` | Wells, empty-state chips |
+| `line-subtle` | `#ebeff2` | `#1e2a2f` | Faint dividers |
+| `line` | `#dce3e8` | `#29373d` | Default borders |
+| `line-strong` | `#c6d0d6` | `#3a4a51` | Emphasis / dashed borders |
+| `ink` | `#0e1b21` | `#e7eef0` | Primary text |
+| `ink-muted` | `#55666f` | `#98a8b0` | Secondary text |
+| `ink-subtle` | `#8a969d` | `#64757d` | Tertiary text, placeholders, icons |
 
-Support both light and dark via CSS variables plus `prefers-color-scheme` (reuse Flux's dark-mode approach).
+Brand & semantic:
+
+| Token | Light | Dark | Use |
+|---|---|---|---|
+| `brand` | `#0f766e` | `#2dd4bf` | Links, icons, primary button fill |
+| `brand-strong` | `#0b5d57` | `#5eead4` | Hover / active |
+| `on-brand` | `#ffffff` | `#04211e` | Text/icon on a brand fill |
+| `brand-soft` | `#e5f1ef` | `#10312d` | Tinted wells, monograms, chip hover |
+| `brand-line` | `#bcdcd7` | `#1e4842` | Brand-tinted rings/borders |
+| `accent*` | amber `#f59e0b` | `#fbbf24` | Featured badges & highlights (`accent-soft` / `accent-text` / `accent-line`) |
+| `success*` | `#16a34a` | `#34d399` | "Open now", confirmations (`success-soft` / `success-text`) |
+| `danger*` | `#dc2626` | `#f87171` | Errors, destructive (`danger-soft` / `danger-text`) |
+
+All text pairs meet WCAG AA (≥4.5:1) on their intended surface.
 
 ### Typography
 
-- **UI / body:** Inter (system-ui fallback). Base 16px, line-height 1.6.
-- **Headings:** Inter 600–700. Scale: h1 2rem, h2 1.5rem, h3 1.25rem.
-- **Numbers/stats:** tabular-nums for dashboard figures.
+- **Display / headings:** Bricolage Grotesque (600–800), utility `font-display`. Restraint: hero, section headings, business names. Loaded via Bunny Fonts.
+- **UI / body:** Inter (400–700), `font-sans`. Base 16px, line-height 1.6.
+- **Numbers/stats:** `tabular-nums`.
+- Scale: hero up to ~3.75rem; section h2 1.75–1.875rem; card/aside headings 1–1.125rem; eyebrow 0.75rem uppercase, tracking 0.16em (`.eyebrow`).
 
-### Spacing & layout
+### Spacing, layout & elevation
 
-- 4px base scale (4, 8, 12, 16, 24, 32, 48, 64).
-- Max content width 1200px; listing detail 720px reading column.
-- Radius: 8px cards, 6px inputs, 999px pills/badges.
-- Shadow: one soft elevation for cards, one stronger for the portal's sticky action bar.
+- 4px base scale (4, 8, 12, 16, 20, 24, 32, 40, 48, 64, 80).
+- Generous section rhythm: `py-16` mobile → `py-20`+ desktop; `mt-24` before the footer.
+- Max content width 76rem (1216px); listing-detail reading column 45rem.
+- Radius: `rounded-xl` (12px) cards, `rounded-lg` (8px) inputs/buttons, `rounded-2xl`/`3xl` hero & CTA panels, full pills/badges.
+- Elevation: borders carry it. `--shadow-card` (hairline) at rest; `--shadow-lift` on hover only via `.hover-lift` (2px rise + brand-tinted edge).
+- Glassmorphism: `.glass-header` — sticky, translucent `bg-canvas/80` + `backdrop-blur-md backdrop-saturate-150` + hairline border (opaque fallback via `@supports`).
 
-### Component inventory
+### Component classes (`app.css`)
 
-Public: header with search, category chips, listing card (photo, name, category, city, rating, featured badge), city/category index grid, breadcrumb, pagination, map embed, lead/enquiry form, footer with internal-link columns.
+`.btn` + `.btn-primary` / `.btn-ghost`, `.field` (inputs/select/textarea), `.chip` + `.chip-active` (filters/pills), `.surface-card` (de-boxed card base), `.hover-lift`, `.eyebrow`, `.glass-header`.
 
-Portal: sidebar nav, stat card, live-edit form fields, photo uploader with drag reorder, plan/tier selector, leads inbox row, empty states.
+Blade components: `x-public-layout`, `x-business-card`, `x-category-tile`, `x-category-icon`, `x-breadcrumbs`.
 
-Shared: button (primary/secondary/ghost), input, select, textarea, toggle, badge, toast, modal.
+### Accessibility floor
+
+Visible `:focus-visible` ring on every interactive element; skip-to-content link; inline SVG icons (no emoji) marked `aria-hidden`; form labels present (visually hidden where space is tight); `prefers-reduced-motion` neutralises transitions; verified responsive at 375 / 768 / 1024 / 1440.
 
 ---
 

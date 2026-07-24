@@ -1,27 +1,45 @@
 <x-public-layout :title="$category->name.' | Localist'" :description="'Find trusted '.strtolower($category->name).' near you. Compare '.number_format($businesses->total()).' local businesses on Localist.'">
     <x-json-ld :data="\App\Services\Seo::itemList($businesses->getCollection(), $category->name.' on Localist')" />
-    <div class="mx-auto max-w-[75rem] px-4 py-10">
-        <nav class="text-sm text-gray-500 dark:text-gray-400"><a href="{{ route('home') }}" class="hover:text-teal-700 dark:hover:text-teal-400">Home</a> / {{ $category->name }}</nav>
-        <h1 class="mt-2 text-3xl font-bold">{{ $category->name }}</h1>
-        <p class="mt-1 text-gray-500 dark:text-gray-400">{{ number_format($businesses->total()) }} businesses</p>
+
+    <div class="mx-auto max-w-[76rem] px-4 py-10 sm:px-6 sm:py-12">
+        <x-breadcrumbs :items="[['Home', route('home')], [$category->name, null]]" />
+
+        <div class="mt-5 flex items-start gap-4">
+            <span class="grid size-14 shrink-0 place-items-center rounded-2xl bg-brand-soft text-brand ring-1 ring-inset ring-brand-line">
+                <x-category-icon :slug="$category->slug" class="size-7" />
+            </span>
+            <div>
+                <h1 class="font-display text-3xl font-bold text-ink sm:text-4xl">{{ $category->name }}</h1>
+                <p class="mt-1 text-ink-muted"><span class="font-medium text-ink">{{ number_format($businesses->total()) }}</span> businesses across Malaysia</p>
+            </div>
+        </div>
 
         @if ($cities->isNotEmpty())
-            <div class="mt-6 flex flex-wrap gap-2">
-                <a href="{{ route('category', $category) }}"
-                    class="rounded-full px-3 py-1.5 text-sm font-medium {{ request('city') ? 'border border-gray-200 dark:border-gray-800 hover:border-teal-600' : 'bg-teal-700 text-white' }}">All cities</a>
+            {{-- City filter — collapses to one row; "show more" is a CSS-only peer toggle (public pages have no Alpine) --}}
+            <div class="mt-8 flex flex-wrap gap-2">
+                <input type="checkbox" id="more-cities" class="peer sr-only" aria-label="Show all cities">
+                <a href="{{ route('category', $category) }}" @class(['chip', 'chip-active' => ! request('city')])>All cities</a>
                 @foreach ($cities as $city)
                     <a href="{{ route('city.category', [$city, $category]) }}"
-                        class="rounded-full border border-gray-200 dark:border-gray-800 px-3 py-1.5 text-sm font-medium hover:border-teal-600 hover:text-teal-700 dark:hover:text-teal-400">{{ $city->name }}</a>
+                        @class([
+                            'chip',
+                            'chip-active' => request('city') === $city->slug,
+                            'hidden peer-checked:inline-flex' => $loop->index >= 9 && request('city') !== $city->slug,
+                        ])>{{ $city->name }}</a>
                 @endforeach
+                @if ($cities->count() > 9)
+                    <label for="more-cities" class="chip cursor-pointer select-none peer-checked:hidden">+{{ $cities->count() - 9 }} more</label>
+                    <label for="more-cities" class="chip hidden cursor-pointer select-none peer-checked:inline-flex">Show fewer</label>
+                @endif
             </div>
         @endif
 
         <div class="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             @foreach ($businesses as $business)
-                <x-business-card :business="$business" />
+                <x-business-card :business="$business" :hide-category="true" />
             @endforeach
         </div>
 
-        <div class="mt-8">{{ $businesses->links() }}</div>
+        <div class="mt-10">{{ $businesses->links() }}</div>
     </div>
 </x-public-layout>

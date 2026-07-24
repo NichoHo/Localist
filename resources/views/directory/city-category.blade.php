@@ -5,14 +5,19 @@
         [$city->name, route('city', $city)],
         [$category->name, route('city.category', [$city, $category])],
     ])" />
-    <div class="mx-auto max-w-[75rem] px-4 py-10">
-        <nav class="text-sm text-gray-500 dark:text-gray-400">
-            <a href="{{ route('home') }}" class="hover:text-teal-700 dark:hover:text-teal-400">Home</a> /
-            <a href="{{ route('city', $city) }}" class="hover:text-teal-700 dark:hover:text-teal-400">{{ $city->name }}</a> /
-            {{ $category->name }}
-        </nav>
-        <h1 class="mt-2 text-3xl font-bold">{{ $category->name }} in {{ $city->name }}</h1>
-        <p class="mt-1 text-gray-500 dark:text-gray-400">{{ number_format($businesses->total()) }} businesses · {{ $city->region }}</p>
+
+    <div class="mx-auto max-w-[76rem] px-4 py-10 sm:px-6 sm:py-12">
+        <x-breadcrumbs :items="[['Home', route('home')], [$city->name, route('city', $city)], [$category->name, null]]" />
+
+        <div class="mt-5 flex items-start gap-4">
+            <span class="grid size-14 shrink-0 place-items-center rounded-2xl bg-brand-soft text-brand ring-1 ring-inset ring-brand-line">
+                <x-category-icon :slug="$category->slug" class="size-7" />
+            </span>
+            <div>
+                <h1 class="font-display text-3xl font-bold text-ink sm:text-4xl">{{ $category->name }} in {{ $city->name }}</h1>
+                <p class="mt-1 text-ink-muted"><span class="font-medium text-ink">{{ number_format($businesses->total()) }}</span> businesses · {{ $city->region }}</p>
+            </div>
+        </div>
 
         <div class="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             @foreach ($businesses as $business)
@@ -20,25 +25,27 @@
             @endforeach
         </div>
 
-        <div class="mt-8">{{ $businesses->links() }}</div>
+        <div class="mt-10">{{ $businesses->links() }}</div>
 
         @if ($nearbyCities->isNotEmpty())
-            <h2 class="mt-12 text-lg font-semibold">{{ $category->name }} in nearby cities</h2>
-            <div class="mt-3 flex flex-wrap gap-2">
-                @foreach ($nearbyCities as $nearby)
-                    <a href="{{ route('city.category', [$nearby, $category]) }}"
-                        class="rounded-full border border-gray-200 dark:border-gray-800 px-3 py-1.5 text-sm font-medium hover:border-teal-600 hover:text-teal-700 dark:hover:text-teal-400">{{ $nearby->name }}</a>
-                @endforeach
+            <div class="mt-16 border-t border-line-subtle pt-8">
+                <h2 class="font-display text-lg font-bold text-ink">{{ $category->name }} in nearby cities</h2>
+                <div class="mt-4 flex flex-wrap gap-2">
+                    @foreach ($nearbyCities as $nearby)
+                        <a href="{{ route('city.category', [$nearby, $category]) }}" class="chip">{{ $nearby->name }}</a>
+                    @endforeach
+                </div>
             </div>
         @endif
 
         @if ($relatedCategories->isNotEmpty())
-            <h2 class="mt-8 text-lg font-semibold">Other services in {{ $city->name }}</h2>
-            <div class="mt-3 flex flex-wrap gap-2">
-                @foreach ($relatedCategories as $related)
-                    <a href="{{ route('city.category', [$city, $related]) }}"
-                        class="rounded-full border border-gray-200 dark:border-gray-800 px-3 py-1.5 text-sm font-medium hover:border-teal-600 hover:text-teal-700 dark:hover:text-teal-400">{{ $related->name }}</a>
-                @endforeach
+            <div class="mt-10">
+                <h2 class="font-display text-lg font-bold text-ink">Other services in {{ $city->name }}</h2>
+                <div class="mt-4 flex flex-wrap gap-2">
+                    @foreach ($relatedCategories as $related)
+                        <a href="{{ route('city.category', [$city, $related]) }}" class="chip">{{ $related->name }}</a>
+                    @endforeach
+                </div>
             </div>
         @endif
     </div>

@@ -4,10 +4,215 @@
 /* Laravel paginator views live in vendor (gitignored), so Tailwind won't scan them by default */
 @source "../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php";
 
-@theme {
-    --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif;
-}
-
+/* ============================================================================
+   Localist design tokens — see localist_project_spec.md §5
+   Depth comes from surface-level shift (tinted canvas vs. white surface) and
+   hairline elevation borders, not heavy shadows. Values switch on the OS
+   color scheme; utilities reference them via @theme inline below.
+   ========================================================================== */
 :root {
     color-scheme: light dark;
+
+    /* Neutral surface scale (cool-tinted) */
+    --canvas:        #f6f8f9;
+    --canvas-2:      #eef2f4;
+    --surface:       #ffffff;
+    --sunken:        #edf1f3;
+    --line-subtle:   #ebeff2;
+    --line:          #dce3e8;
+    --line-strong:   #c6d0d6;
+
+    /* Ink (text) */
+    --ink:           #0e1b21;
+    --ink-muted:     #55666f;
+    --ink-subtle:    #8a969d;
+
+    /* Brand — teal (trust / competence) */
+    --brand:         #0f766e;
+    --brand-strong:  #0b5d57;
+    --on-brand:      #ffffff;
+    --brand-soft:    #e5f1ef;
+    --brand-line:    #bcdcd7;
+
+    /* Accent — amber (featured / premium) */
+    --accent:        #f59e0b;
+    --accent-soft:   #fbf0db;
+    --accent-text:   #8a5a08;
+    --accent-line:   #ebce9a;
+
+    /* Semantic */
+    --success:       #16a34a;   /* "Open now" */
+    --success-soft:  #e4f4ea;
+    --success-text:  #157f3b;
+    --danger:        #dc2626;
+    --danger-soft:   #fbe9e8;
+    --danger-text:   #b42318;
+}
+
+@media (prefers-color-scheme: dark) {
+    :root {
+        --canvas:        #0a1417;
+        --canvas-2:      #0e1a1e;
+        --surface:       #131e22;
+        --sunken:        #0c1519;
+        --line-subtle:   #1e2a2f;
+        --line:          #29373d;
+        --line-strong:   #3a4a51;
+
+        --ink:           #e7eef0;
+        --ink-muted:     #98a8b0;
+        --ink-subtle:    #64757d;
+
+        --brand:         #2dd4bf;
+        --brand-strong:  #5eead4;
+        --on-brand:      #04211e;
+        --brand-soft:    #10312d;
+        --brand-line:    #1e4842;
+
+        --accent:        #fbbf24;
+        --accent-soft:   #33280e;
+        --accent-text:   #fbd267;
+        --accent-line:   #4d3d14;
+
+        --success:       #34d399;
+        --success-soft:  #0f2c20;
+        --success-text:  #4ade80;
+        --danger:        #f87171;
+        --danger-soft:   #33191a;
+        --danger-text:   #fca5a5;
+    }
+}
+
+/* Expose tokens to Tailwind utilities (bg-surface, text-ink, border-line, …).
+   `inline` keeps the runtime var() reference so light/dark switching works. */
+@theme inline {
+    --font-sans:    'Inter', ui-sans-serif, system-ui, sans-serif;
+    --font-display: 'Bricolage Grotesque', 'Inter', ui-sans-serif, system-ui, sans-serif;
+
+    --color-canvas:        var(--canvas);
+    --color-canvas-2:      var(--canvas-2);
+    --color-surface:       var(--surface);
+    --color-sunken:        var(--sunken);
+    --color-line-subtle:   var(--line-subtle);
+    --color-line:          var(--line);
+    --color-line-strong:   var(--line-strong);
+
+    --color-ink:           var(--ink);
+    --color-ink-muted:     var(--ink-muted);
+    --color-ink-subtle:    var(--ink-subtle);
+
+    --color-brand:         var(--brand);
+    --color-brand-strong:  var(--brand-strong);
+    --color-on-brand:      var(--on-brand);
+    --color-brand-soft:    var(--brand-soft);
+    --color-brand-line:    var(--brand-line);
+
+    --color-accent:        var(--accent);
+    --color-accent-soft:   var(--accent-soft);
+    --color-accent-text:   var(--accent-text);
+    --color-accent-line:   var(--accent-line);
+
+    --color-success:       var(--success);
+    --color-success-soft:  var(--success-soft);
+    --color-success-text:  var(--success-text);
+    --color-danger:        var(--danger);
+    --color-danger-soft:   var(--danger-soft);
+    --color-danger-text:   var(--danger-text);
+
+    /* Soft, cool-tinted elevation — carried mostly by borders, lifted on hover */
+    --shadow-card:  0 1px 2px 0 rgb(13 26 32 / 0.04), 0 1px 3px 0 rgb(13 26 32 / 0.05);
+    --shadow-lift:  0 12px 32px -12px rgb(13 26 32 / 0.18), 0 6px 14px -8px rgb(13 26 32 / 0.10);
+}
+
+/* ============================================================================
+   Base
+   ========================================================================== */
+@layer base {
+    body {
+        background-color: var(--canvas);
+        color: var(--ink);
+    }
+
+    ::selection {
+        background-color: var(--brand-soft);
+        color: var(--brand-strong);
+    }
+
+    /* Consistent, visible keyboard focus everywhere */
+    :focus-visible {
+        outline: 2px solid var(--brand);
+        outline-offset: 2px;
+    }
+}
+
+/* ============================================================================
+   Components — repeated marketplace patterns, kept DRY and cohesive
+   ========================================================================== */
+@layer components {
+    .eyebrow {
+        @apply text-xs font-semibold uppercase tracking-[0.16em] text-brand;
+    }
+
+    /* De-boxed card base: white surface on tinted canvas + hairline border */
+    .surface-card {
+        @apply rounded-xl border border-line bg-surface;
+    }
+
+    /* Soft hover: gentle lift + brand-tinted edge (animation removed under reduced-motion) */
+    .hover-lift {
+        @apply transition duration-200 ease-out;
+    }
+    .hover-lift:hover {
+        @apply -translate-y-0.5 border-brand-line shadow-lift;
+    }
+
+    .eyebrow-line {
+        @apply flex items-center gap-3;
+    }
+
+    /* Pills / filter chips */
+    .chip {
+        @apply inline-flex items-center gap-1.5 rounded-full border border-line bg-surface px-3.5 py-1.5 text-sm font-medium text-ink-muted transition duration-200 hover:border-brand-line hover:bg-brand-soft hover:text-brand;
+    }
+    .chip-active {
+        @apply border-transparent bg-brand text-on-brand hover:border-transparent hover:bg-brand-strong hover:text-on-brand;
+    }
+
+    /* Form fields */
+    .field {
+        @apply w-full rounded-lg border border-line bg-surface px-3.5 py-2.5 text-sm text-ink placeholder:text-ink-subtle transition focus:border-brand focus:ring-2 focus:ring-brand/25 focus:outline-none;
+    }
+
+    /* Buttons — use as `btn btn-primary` / `btn btn-ghost` */
+    .btn {
+        @apply inline-flex items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-sm font-semibold transition duration-200 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/70 focus-visible:ring-offset-2 focus-visible:ring-offset-canvas;
+    }
+    .btn-primary {
+        @apply bg-brand text-on-brand shadow-card hover:bg-brand-strong;
+    }
+    .btn-ghost {
+        @apply border border-line bg-surface text-ink hover:border-brand-line hover:bg-brand-soft hover:text-brand;
+    }
+
+    /* Glassmorphism sticky header */
+    .glass-header {
+        @apply sticky top-0 z-40 border-b border-line/70 bg-canvas/80 backdrop-blur-md backdrop-saturate-150;
+    }
+    @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+        .glass-header {
+            @apply bg-canvas;
+        }
+    }
+}
+
+/* Respect reduced-motion for all transitions/animations */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    ::before,
+    ::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
 }
