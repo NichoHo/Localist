@@ -22,7 +22,7 @@
 
         @if ($photos->isEmpty())
             <div class="mt-8 rounded-lg border border-dashed border-gray-300 dark:border-gray-700 p-10 text-center text-gray-500 dark:text-gray-400">
-                No photos yet — listings with photos get more enquiries.
+                No photos yet. Listings with photos get more enquiries.
             </div>
         @else
             <ul class="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-3"

@@ -1,4 +1,4 @@
-<x-public-layout :title="$business->name.' — '.$business->category->name.' in '.$business->city->name.' | Localist'" :description="Str::limit($business->description, 155)">
+<x-public-layout :title="$business->name.' - '.$business->category->name.' in '.$business->city->name.' | Localist'" :description="Str::limit($business->description, 155)">
     <x-json-ld :data="\App\Services\Seo::localBusiness($business)" />
     <x-json-ld :data="\App\Services\Seo::breadcrumbs([
         ['Home', route('home')],

@@ -1,4 +1,4 @@
-<x-public-layout :title="$category->name.' in '.$city->name.' — Localist'" :description="'Compare '.number_format($businesses->total()).' trusted '.strtolower($category->name).' in '.$city->name.', '.$city->region.'.'">
+<x-public-layout :title="$category->name.' in '.$city->name.' | Localist'" :description="'Compare '.number_format($businesses->total()).' trusted '.strtolower($category->name).' in '.$city->name.', '.$city->region.'.'">
     <x-json-ld :data="\App\Services\Seo::itemList($businesses->getCollection(), $category->name.' in '.$city->name)" />
     <x-json-ld :data="\App\Services\Seo::breadcrumbs([
         ['Home', route('home')],

@@ -16,7 +16,7 @@
         <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
             Public URL: <span class="font-mono">/business/{{ $this->slugPreview }}</span>
             @if ($this->slugPreview !== $business->slug)
-                <span class="ml-1 rounded-full bg-amber-100 dark:bg-amber-400/10 px-2 py-0.5 text-xs font-semibold text-amber-700 dark:text-amber-300">URL will change — a 301 redirect will be created</span>
+                <span class="ml-1 rounded-full bg-amber-100 dark:bg-amber-400/10 px-2 py-0.5 text-xs font-semibold text-amber-700 dark:text-amber-300">URL will change, a 301 redirect will be created</span>
             @endif
         </p>
 

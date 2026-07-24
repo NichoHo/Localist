@@ -1,4 +1,4 @@
-@props(['title' => 'Localist — Find trusted local services', 'description' => 'Browse trusted local service businesses across Malaysia.', 'noindex' => false])
+@props(['title' => 'Localist | Find trusted local services', 'description' => 'Browse trusted local service businesses across Malaysia.', 'noindex' => false])
 
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">

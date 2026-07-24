@@ -1,4 +1,4 @@
-<x-public-layout :title="'Local services in '.$city->name.' — Localist'" :description="'Browse trusted local service businesses in '.$city->name.', '.$city->region.' by category.'">
+<x-public-layout :title="'Local services in '.$city->name.' | Localist'" :description="'Browse trusted local service businesses in '.$city->name.', '.$city->region.' by category.'">
     <div class="mx-auto max-w-[75rem] px-4 py-10">
         <nav class="text-sm text-gray-500 dark:text-gray-400"><a href="{{ route('home') }}" class="hover:text-teal-700 dark:hover:text-teal-400">Home</a> / {{ $city->name }}</nav>
         <h1 class="mt-2 text-3xl font-bold">Local services in {{ $city->name }}</h1>

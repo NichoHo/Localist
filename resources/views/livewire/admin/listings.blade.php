@@ -1,5 +1,5 @@
 <div class="mx-auto max-w-6xl px-4 py-10">
-    <h1 class="text-2xl font-bold">Admin — Listings</h1>
+    <h1 class="text-2xl font-bold">Admin Listings</h1>
 
     <div class="mt-6 flex flex-wrap items-center gap-2">
         @foreach (['pending', 'published', 'draft', 'all'] as $tab)
@@ -40,7 +40,7 @@
                             </td>
                             <td class="px-4 py-3 text-gray-500 dark:text-gray-400">{{ $business->category->name }} · {{ $business->city->name }}</td>
                             <td class="px-4 py-3">{{ $business->plan->name }}</td>
-                            <td class="px-4 py-3 text-gray-500 dark:text-gray-400">{{ $business->user?->email ?? '—' }}</td>
+                            <td class="px-4 py-3 text-gray-500 dark:text-gray-400">{{ $business->user?->email ?? '-' }}</td>
                             <td class="px-4 py-3">
                                 <span class="rounded-full px-2 py-0.5 text-xs font-semibold capitalize
                                     {{ $business->status === 'published' ? 'bg-green-100 text-green-700 dark:bg-green-400/10 dark:text-green-300' : 'bg-amber-100 text-amber-700 dark:bg-amber-400/10 dark:text-amber-300' }}">

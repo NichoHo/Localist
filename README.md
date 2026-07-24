@@ -4,7 +4,7 @@ A directory platform for local service businesses. Public programmatic directory
 
 **Stack:** Laravel 12 · Livewire 3 + Alpine · Blade + Tailwind CSS 4 · MySQL · Stripe (Cashier) · Cloudflare
 
-> Seed data is synthetic (5,000 generated Malaysian listings) — clearly labeled as demo content.
+> Seed data is synthetic (5,000 generated Malaysian listings), clearly labeled as demo content.
 
 ## Local setup
 
@@ -31,7 +31,7 @@ STRIPE_PRICE_FEATURED=price_...   # recurring monthly test prices
 STRIPE_PRICE_PREMIUM=price_...
 ```
 
-Without keys, `/billing` renders but upgrade shows a friendly "not configured" notice. Renewal/cancellation sync would use Cashier's webhook (`/stripe/webhook`) — the demo applies plans on the Checkout success callback.
+Without keys, `/billing` renders but upgrade shows a friendly "not configured" notice. Renewal/cancellation sync would use Cashier's webhook (`/stripe/webhook`); the demo applies plans on the Checkout success callback.
 
 ## Cloudflare
 
@@ -39,8 +39,8 @@ Cache boundary is already correct at the Laravel level: public routes send `Cach
 
 Dashboard config (two cache rules):
 
-1. **Cache everything** on public paths — respect origin headers (origin already sends them).
-2. **Bypass cache** when the request has a session cookie (`laravel_session`) — covers portal + admin.
+1. **Cache everything** on public paths, respect origin headers (origin already sends them).
+2. **Bypass cache** when the request has a session cookie (`laravel_session`), covers portal + admin.
 
 Purge-on-publish: editing/approving a listing dispatches a job that purges that listing's URL plus its city/category/home index pages. Add to `.env`:
 

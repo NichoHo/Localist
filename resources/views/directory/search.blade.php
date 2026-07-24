@@ -1,4 +1,4 @@
-<x-public-layout :title="($q ? 'Search: '.$q : 'Search').' — Localist'" :noindex="true">
+<x-public-layout :title="($q ? 'Search: '.$q : 'Search').' | Localist'" :noindex="true">
     <div class="mx-auto max-w-[75rem] px-4 py-10">
         <h1 class="text-3xl font-bold">Search</h1>
         <form action="{{ route('search') }}" method="get" class="mt-4 flex max-w-xl gap-2">

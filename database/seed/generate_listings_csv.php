@@ -1,5 +1,5 @@
 <?php
-// Generates database/seed/listings.csv — ~5,000 synthetic Malaysian local-service listings.
+// Generates database/seed/listings.csv with ~5,000 synthetic Malaysian local-service listings.
 // Synthetic data, clearly labeled. Lat/lng = city center + jitter (no geocoding API needed for seed).
 
 $categories = [

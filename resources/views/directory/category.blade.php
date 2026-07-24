@@ -1,4 +1,4 @@
-<x-public-layout :title="$category->name.' — Localist'" :description="'Find trusted '.strtolower($category->name).' near you. Compare '.number_format($businesses->total()).' local businesses on Localist.'">
+<x-public-layout :title="$category->name.' | Localist'" :description="'Find trusted '.strtolower($category->name).' near you. Compare '.number_format($businesses->total()).' local businesses on Localist.'">
     <x-json-ld :data="\App\Services\Seo::itemList($businesses->getCollection(), $category->name.' on Localist')" />
     <div class="mx-auto max-w-[75rem] px-4 py-10">
         <nav class="text-sm text-gray-500 dark:text-gray-400"><a href="{{ route('home') }}" class="hover:text-teal-700 dark:hover:text-teal-400">Home</a> / {{ $category->name }}</nav>

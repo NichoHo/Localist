@@ -1,7 +1,7 @@
 <x-public-layout>
     <section class="bg-gradient-to-b from-teal-700 to-teal-800 px-4 py-16 text-center text-white">
         <h1 class="text-3xl font-bold sm:text-4xl">Find trusted local services near you</h1>
-        <p class="mx-auto mt-3 max-w-xl text-teal-100">Plumbers, electricians, cleaners, tutors and more — across {{ $cityCount }} Malaysian cities.</p>
+        <p class="mx-auto mt-3 max-w-xl text-teal-100">Plumbers, electricians, cleaners, tutors and more across {{ $cityCount }} Malaysian cities.</p>
         <form action="{{ route('search') }}" method="get" class="mx-auto mt-8 flex max-w-xl gap-2">
             <input type="search" name="q" placeholder="What do you need help with?"
                 class="flex-1 rounded-md border-0 text-gray-900 focus:ring-2 focus:ring-amber-400 dark:bg-gray-900 dark:text-gray-100">

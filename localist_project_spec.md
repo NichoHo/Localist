@@ -1,8 +1,8 @@
-# Localist — Project Specification & Build Blueprint
+# Localist: Project Specification & Build Blueprint
 
 *A directory platform for local service businesses. Public directory pages plus a Livewire portal where businesses claim and manage their own paid listing. Same architecture as a regenerative-medicine clinic directory, different vertical.*
 
-> **Internal note (delete before sharing publicly):** This project is built to demonstrate the exact stack and architecture a Laravel + Livewire directory job asks for — a public programmatic directory, a Livewire/Alpine management portal, Cloudflare in front, and technical SEO. Every requirement below maps to something a client can see on a screen-share. Build it in the phase order given so there's always a demoable slice.
+> **Internal note (delete before sharing publicly):** This project is built to demonstrate the exact stack and architecture a Laravel + Livewire directory job asks for, a public programmatic directory, a Livewire/Alpine management portal, Cloudflare in front, and technical SEO. Every requirement below maps to something a client can see on a screen-share. Build it in the phase order given so there's always a demoable slice.
 
 ---
 
@@ -12,8 +12,8 @@ Localist is a searchable directory of local service businesses (plumbers, electr
 
 **Two halves, one product:**
 
-- **Public directory** — thousands of programmatically generated pages, fast, cached, and SEO-optimized. This is what the public and search engines see.
-- **Owner portal** — a Livewire + Alpine app behind auth where businesses manage their own paid listing. This is the revenue side.
+- **Public directory**: thousands of programmatically generated pages, fast, cached, and SEO-optimized. This is what the public and search engines see.
+- **Owner portal**: a Livewire + Alpine app behind auth where businesses manage their own paid listing. This is the revenue side.
 
 **Scale target:** ~5,000 public pages (individual listings + category × city index pages). Large enough to be a real programmatic site, small enough for one developer to build and seed credibly.
 
@@ -24,7 +24,7 @@ Localist is a searchable directory of local service businesses (plumbers, electr
 | Layer | Choice | Why |
 |---|---|---|
 | Framework | Laravel 12, PHP 8.2 | Matches the target job and the Flux project |
-| Portal UI | Livewire 3 + Alpine.js | The core requirement — a reactive management portal without a separate SPA |
+| Portal UI | Livewire 3 + Alpine.js | The core requirement, a reactive management portal without a separate SPA |
 | Public UI | Blade + Tailwind CSS 4 | Server-rendered, cache-friendly, fast to build |
 | Build | Vite | Same as Flux; asset bundling |
 | Database | MySQL 8 | Familiar, fine for this scale |
@@ -64,22 +64,22 @@ MySQL  ·  Stripe  ·  Google Geocoding  ·  Cloudflare API (purge)
 
 Core tables. Slugs everywhere for clean, SEO-friendly URLs.
 
-**users** — `id, name, email, password, role (owner|admin), google_id?`
+**users**: `id, name, email, password, role (owner|admin), google_id?`
 
-**businesses** (the listing) —
+**businesses** (the listing):
 `id, user_id? (claimant, null until claimed), name, slug, category_id, city_id, description, address, lat, lng, phone, website, email, hours (json), plan_id, status (draft|pending|published), featured_until?, views_count, created_at`
 
-**categories** — `id, name, slug, icon, description`
+**categories**: `id, name, slug, icon, description`
 
-**cities** — `id, name, slug, region, lat, lng`
+**cities**: `id, name, slug, region, lat, lng`
 
-**plans** — `id, name (Free|Featured|Premium), price_monthly, max_photos, allows_website, priority_rank`
+**plans**: `id, name (Free|Featured|Premium), price_monthly, max_photos, allows_website, priority_rank`
 
-**leads** (enquiries from public → business) — `id, business_id, name, email, phone?, message, created_at, read_at?`
+**leads** (enquiries from public → business): `id, business_id, name, email, phone?, message, created_at, read_at?`
 
-**media** — `id, business_id, path, alt, sort_order`
+**media**: `id, business_id, path, alt, sort_order`
 
-**redirects** — `id, from_path, to_path, status_code (301)` — populated automatically when a slug changes, so old URLs never 404 (directly answers the "redirects and canonicals" requirement).
+**redirects**: `id, from_path, to_path, status_code (301)`, populated automatically when a slug changes, so old URLs never 404 (directly answers the "redirects and canonicals" requirement).
 
 Relationships: a Business belongs to a Category, a City, a Plan, and optionally a User (the owner who claimed it). Category and City each have many Businesses. Business has many Media and many Leads.
 
@@ -133,13 +133,13 @@ Shared: button (primary/secondary/ghost), input, select, textarea, toggle, badge
 
 | Route | Page | SEO focus |
 |---|---|---|
-| `/` | Home — search, popular categories, featured businesses, popular cities | Site-level; internal links out to categories/cities |
+| `/` | Home, search, popular categories, featured businesses, popular cities | Site-level; internal links out to categories/cities |
 | `/category/{category}` | All businesses in a category, filterable by city | `ItemList` JSON-LD, canonical, paginated |
 | `/{city}` | All businesses in a city, grouped by category | `ItemList`, canonical |
-| `/{city}/{category}` | The money page — businesses of a category in a city (the bulk of the ~5,000 pages) | `ItemList` + `BreadcrumbList`, canonical, internal links to nearby cities/related categories |
-| `/business/{slug}` | Individual listing — details, hours, map, photos, enquiry form | `LocalBusiness` JSON-LD, `BreadcrumbList`, canonical |
+| `/{city}/{category}` | The money page, businesses of a category in a city (the bulk of the ~5,000 pages) | `ItemList` + `BreadcrumbList`, canonical, internal links to nearby cities/related categories |
+| `/business/{slug}` | Individual listing, details, hours, map, photos, enquiry form | `LocalBusiness` JSON-LD, `BreadcrumbList`, canonical |
 | `/search?q=` | Search results | `noindex` (thin/duplicate) |
-| `/claim/{slug}` | Claim-this-listing entry point → registration | — |
+| `/claim/{slug}` | Claim-this-listing entry point → registration | - |
 
 All public pages: server-rendered Blade, anonymous, cacheable. Featured listings rank above free ones via `plans.priority_rank`.
 
@@ -147,7 +147,7 @@ All public pages: server-rendered Blade, anonymous, cacheable. Featured listings
 
 ## 7. Owner portal (Livewire side)
 
-Behind auth. Each Livewire component is stateful and updates without full page reloads — this is the part that directly demonstrates the job's core requirement.
+Behind auth. Each Livewire component is stateful and updates without full page reloads. This is the part that directly demonstrates the job's core requirement.
 
 | Route | Component | What it does |
 |---|---|---|
@@ -158,7 +158,7 @@ Behind auth. Each Livewire component is stateful and updates without full page r
 | `/leads` | `Portal\Leads` | Inbox of enquiries, mark read/unread, live unread counter |
 | `/settings` | `Portal\Settings` | Account, password, notification prefs |
 
-**Admin (role = admin):** `/admin` — approve pending listings, manage categories/cities, run imports, view all businesses. Can be Livewire too, or a lightweight Filament panel if you want to save time (note it as a deliberate shortcut).
+**Admin (role = admin):** `/admin`, approve pending listings, manage categories/cities, run imports, view all businesses. Can be Livewire too, or a lightweight Filament panel if you want to save time (note it as a deliberate shortcut).
 
 ---
 
@@ -178,7 +178,7 @@ This section is where the job's "technical SEO" bullet gets demonstrated concret
 
 **Canonicals:** every public page emits a self-referencing canonical; paginated pages canonical to page 1 or use `rel=next/prev`. Search and filtered views are `noindex`.
 
-**Redirects:** a `redirects` table + middleware. When a business or city slug changes, write a `301` from the old path. Old URLs never 404 — the exact "redirects and canonicals" requirement.
+**Redirects:** a `redirects` table + middleware. When a business or city slug changes, write a `301` from the old path. Old URLs never 404, the exact "redirects and canonicals" requirement.
 
 **Internal linking:** listing pages link to their city and category; category/city pages link to related categories and nearby cities. This is what makes a programmatic site actually rank, and it's cheap to build with related-query scopes.
 
@@ -208,29 +208,29 @@ This covers the job's "import and process content and data in bulk" line.
 
 Each phase ends in something demoable. Don't start a phase before the previous one runs.
 
-### Phase 0 — Foundation (setup)
+### Phase 0: Foundation (setup)
 - Laravel 12 app, MySQL, Tailwind + Vite, Breeze auth, Docker, deploy skeleton.
 - Migrations for all tables in §4.
 - **Done when:** app boots, migrates, deploys, login works.
 
-### Phase 1 — Public directory + data
+### Phase 1: Public directory + data
 - Seed data via the CSV importer (§10) + geocoding.
 - Public routes and Blade pages (§6): home, category, city, city/category, listing detail.
 - Featured-first ordering.
 - **Done when:** ~5,000 pages are browsable and the directory feels real.
 
-### Phase 2 — Owner portal (the core)
+### Phase 2: Owner portal (the core)
 - Claim flow → register → dashboard.
 - Livewire components: EditListing, Photos, Dashboard, Leads (§7).
 - Alpine for the hours editor, photo reorder, unsaved-changes guard.
 - **Done when:** an owner can claim a listing and edit it live end to end.
 
-### Phase 3 — Payments + SEO
+### Phase 3: Payments + SEO
 - Plans, Stripe Checkout via Cashier, plan gating (photo limits, featured placement).
 - Full SEO layer (§8): JSON-LD, sitemaps, canonicals, redirects, internal linking.
 - **Done when:** upgrading to Featured changes ranking, and structured data validates in Google's Rich Results test.
 
-### Phase 4 — Cloudflare, polish, deploy
+### Phase 4: Cloudflare, polish, deploy
 - Cloudflare page rules + purge-on-publish job (§9).
 - Dark mode, empty states, admin approval flow, mobile pass.
 - Lighthouse/perf pass on public pages.
@@ -240,7 +240,7 @@ Each phase ends in something demoable. Don't start a phase before the previous o
 
 ## 12. Testing
 
-Keep it proportional — this is a portfolio build, not a bank.
+Keep it proportional. This is a portfolio build, not a bank.
 
 - **Feature tests:** claim flow, listing edit saves, plan gating (a free user can't add a 6th photo), lead submission, redirect middleware fires on slug change.
 - **Unit:** SEO builders output valid JSON-LD; sitemap chunking; import idempotency.
@@ -263,9 +263,9 @@ When screen-sharing, these are the moments that map to the job:
 
 ## 14. Deliberate shortcuts (be honest about these)
 
-- Admin panel may use Filament instead of hand-built Livewire to save time — fine, note it.
+- Admin panel may use Filament instead of hand-built Livewire to save time. Fine, note it.
 - Reviews/ratings are stretch scope; stub `aggregateRating` only if reviews exist.
-- Synthetic seed data, clearly labeled — same honesty stance as the Tally project.
+- Synthetic seed data, clearly labeled, same honesty stance as the Tally project.
 - Single Stripe test-mode account; no real billing or dunning logic.
 
 ---
