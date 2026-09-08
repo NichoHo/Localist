@@ -1,7 +1,7 @@
 @props(['category', 'href', 'meta'])
 
 <a href="{{ $href }}" class="group surface-card hover-lift flex items-center gap-4 p-4 sm:p-5">
-    <span class="grid size-11 shrink-0 place-items-center rounded-xl bg-brand-soft text-brand ring-1 ring-inset ring-brand-line transition duration-200 group-hover:bg-brand group-hover:text-on-brand group-hover:ring-brand">
+    <span class="grid size-11 shrink-0 place-items-center rounded-md bg-brand-soft text-brand ring-1 ring-inset ring-brand-line transition duration-150 group-hover:bg-brand group-hover:text-on-brand group-hover:ring-brand">
         <x-category-icon :slug="$category->slug" class="size-[1.35rem]" />
     </span>
     <div class="min-w-0 flex-1">

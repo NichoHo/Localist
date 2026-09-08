@@ -68,6 +68,61 @@ class Business extends Model
         return $this->plan->priority_rank > 0;
     }
 
+    private const DAY_KEYS = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'];
+
+    // Stored hours are Malaysia wall-clock time; the app's own clock (config/app.php) is UTC,
+    // so every comparison needs to happen in the business's own timezone, not the server's.
+    private function localNow(): \Illuminate\Support\Carbon
+    {
+        return now('Asia/Kuala_Lumpur');
+    }
+
+    public function isOpenNow(): bool
+    {
+        $today = $this->hours[self::DAY_KEYS[$this->localNow()->dayOfWeekIso - 1]] ?? null;
+        if (! $today || ($today['closed'] ?? true)) {
+            return false;
+        }
+        $time = $this->localNow()->format('H:i');
+
+        return $time >= $today['open'] && $time <= $today['close'];
+    }
+
+    // null when no hours are on file at all, so callers can hide the status pill entirely.
+    public function openStatusLabel(): ?string
+    {
+        if (! $this->hours) {
+            return null;
+        }
+
+        return $this->isOpenNow() ? 'Open now' : $this->nextOpenLabel();
+    }
+
+    private function nextOpenLabel(): string
+    {
+        $names = ['mon' => 'Mon', 'tue' => 'Tue', 'wed' => 'Wed', 'thu' => 'Thu', 'fri' => 'Fri', 'sat' => 'Sat', 'sun' => 'Sun'];
+
+        for ($i = 0; $i < 7; $i++) {
+            $date = $this->localNow()->addDays($i);
+            $key = self::DAY_KEYS[$date->dayOfWeekIso - 1];
+            $slot = $this->hours[$key] ?? null;
+
+            if (! $slot || ($slot['closed'] ?? true)) {
+                continue;
+            }
+            if ($i === 0) {
+                if ($date->format('H:i') < $slot['open']) {
+                    return 'Opens '.$slot['open'].' today';
+                }
+                continue; // already past close today, keep looking
+            }
+
+            return 'Opens '.$slot['open'].' '.($i === 1 ? 'tomorrow' : $names[$key]);
+        }
+
+        return 'Closed';
+    }
+
     public function getRouteKeyName(): string
     {
         return 'slug';

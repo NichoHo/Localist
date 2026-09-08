@@ -55,7 +55,7 @@
                 <p class="mt-2 flex items-center gap-2 text-xl font-bold text-ink">
                     {{ $business->plan->name }}
                     @if ($business->plan->priority_rank > 0)
-                        <span class="rounded-full bg-accent-soft px-2 py-0.5 text-xs font-semibold text-accent-text ring-1 ring-inset ring-accent-line">Featured</span>
+                        <span class="featured-flag">Featured</span>
                     @endif
                 </p>
             </div>
@@ -123,7 +123,7 @@
                                     </div>
                                 @else
                                     <a href="{{ $href }}" class="group flex items-center gap-2.5 py-1 text-sm">
-                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" class="size-4 shrink-0 text-ink-subtle transition group-hover:text-brand" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v6m3-3H9m12 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" /></svg>
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="size-4 shrink-0 text-ink-subtle transition group-hover:text-brand" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v6m3-3H9m12 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" /></svg>
                                         <span class="text-ink-muted transition group-hover:text-brand">{{ $label }}</span>
                                     </a>
                                 @endif
@@ -139,12 +139,12 @@
                 </section>
 
                 @if ($business->plan->priority_rank === 0)
-                    <section class="overflow-hidden rounded-xl">
-                        <div class="bg-gradient-to-br from-[#0b5d57] to-[#0f766e] p-6">
-                            <p class="text-xs font-semibold uppercase tracking-[0.16em] text-white/70">Upgrade</p>
-                            <h2 class="mt-2 font-display text-lg font-bold text-white">Get featured placement</h2>
-                            <p class="mt-1.5 text-sm leading-relaxed text-white/80">Rank above free listings, show your website link, and add more photos.</p>
-                            <a href="{{ route('portal.billing') }}" class="btn mt-4 bg-white text-[#0b5d57] hover:bg-white/90">See plans</a>
+                    <section class="overflow-hidden rounded-md">
+                        <div class="bg-accent p-6">
+                            <p class="text-xs font-semibold uppercase tracking-[0.14em] text-on-accent/65">Upgrade</p>
+                            <h2 class="mt-2 font-display text-lg font-bold text-on-accent">Get featured placement</h2>
+                            <p class="mt-1.5 text-sm leading-relaxed text-on-accent/75">Rank above free listings, show your website link, and add more photos.</p>
+                            <a href="{{ route('portal.billing') }}" class="btn btn-on-accent mt-4 focus-visible:ring-offset-accent">See plans</a>
                         </div>
                     </section>
                 @endif

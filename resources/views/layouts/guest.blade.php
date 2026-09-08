@@ -8,7 +8,7 @@
         <title>{{ config('app.name', 'Localist') }}</title>
 
         <link rel="preconnect" href="https://fonts.bunny.net">
-        <link href="https://fonts.bunny.net/css?family=bricolage-grotesque:600,700,800|inter:400,500,600,700" rel="stylesheet" />
+        <link href="https://fonts.bunny.net/css?family=archivo:500,600,700,800" rel="stylesheet" />
 
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
@@ -17,11 +17,11 @@
             <a href="{{ route('home') }}" class="font-display text-2xl font-bold tracking-tight text-ink">Localist</a>
 
             <div class="mt-8 w-full max-w-md">
-                <div class="surface-card p-6 shadow-card sm:p-8">
+                <div class="surface-card p-6 sm:p-8">
                     {{ $slot }}
                 </div>
                 <p class="mt-6 text-center text-sm text-ink-muted">
-                    <a href="{{ route('home') }}" class="transition hover:text-brand">&larr; Back to directory</a>
+                    <a href="{{ route('home') }}" class="transition hover:text-ink">&larr; Back to directory</a>
                 </p>
             </div>
         </div>

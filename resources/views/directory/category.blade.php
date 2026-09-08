@@ -5,12 +5,12 @@
         <x-breadcrumbs :items="[['Home', route('home')], [$category->name, null]]" />
 
         <div class="mt-5 flex items-start gap-4">
-            <span class="grid size-14 shrink-0 place-items-center rounded-2xl bg-brand-soft text-brand ring-1 ring-inset ring-brand-line">
-                <x-category-icon :slug="$category->slug" class="size-7" />
+            <span class="grid size-12 shrink-0 place-items-center rounded-md bg-brand-soft text-brand ring-1 ring-inset ring-brand-line">
+                <x-category-icon :slug="$category->slug" class="size-6" />
             </span>
             <div>
                 <h1 class="font-display text-3xl font-bold text-ink sm:text-4xl">{{ $category->name }}</h1>
-                <p class="mt-1 text-ink-muted"><span class="font-medium text-ink">{{ number_format($businesses->total()) }}</span> businesses across Malaysia</p>
+                <p class="mt-1 text-ink-muted"><span class="font-mono font-medium text-ink">{{ number_format($businesses->total()) }}</span> businesses across Malaysia</p>
             </div>
         </div>
 
@@ -34,7 +34,7 @@
             </div>
         @endif
 
-        <div class="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <div class="business-list mt-8">
             @foreach ($businesses as $business)
                 <x-business-card :business="$business" :hide-category="true" />
             @endforeach

@@ -65,7 +65,7 @@ $maxWidth = [
 
     <div
         x-show="show"
-        class="mb-6 transform overflow-hidden rounded-2xl border border-line bg-surface shadow-lift transition-all sm:mx-auto sm:w-full {{ $maxWidth }}"
+        class="mb-6 transform overflow-hidden rounded-md border border-line bg-surface shadow-card transition-all sm:mx-auto sm:w-full {{ $maxWidth }}"
         x-transition:enter="ease-out duration-300"
         x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
         x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100"

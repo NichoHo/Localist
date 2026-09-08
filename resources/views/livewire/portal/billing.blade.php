@@ -22,7 +22,7 @@
                     <div class="flex items-center justify-between gap-2">
                         <h2 class="font-display text-lg font-bold text-ink">{{ $plan->name }}</h2>
                         @if ($plan->priority_rank > 0)
-                            <span class="rounded-full bg-accent-soft px-2 py-0.5 text-xs font-semibold text-accent-text ring-1 ring-inset ring-accent-line">Ranks higher</span>
+                            <span class="featured-flag">Ranks higher</span>
                         @endif
                     </div>
                     <p class="mt-2 text-2xl font-bold tabular-nums text-ink">RM{{ $plan->price_monthly }}<span class="text-sm font-normal text-ink-muted">/mo</span></p>

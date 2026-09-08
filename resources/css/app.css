@@ -5,89 +5,104 @@
 @source "../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php";
 
 /* ============================================================================
-   Localist design tokens — see localist_project_spec.md §5
-   Depth comes from surface-level shift (tinted canvas vs. white surface) and
-   hairline elevation borders, not heavy shadows. Values switch on the OS
-   color scheme; utilities reference them via @theme inline below.
+   Localist design tokens — "Trade Counter": hi-vis yellow on off-black, high
+   contrast, availability first. Depth comes from rules and weight, not shadow.
+   Values switch on the OS color scheme; utilities reference them via @theme
+   inline below. --header-* are deliberately constant across themes: the top
+   nav and footer are a fixed dark band, not a surface that flips with the OS.
    ========================================================================== */
 :root {
     color-scheme: light dark;
 
-    /* Neutral surface scale (cool-tinted) */
-    --canvas:        #f6f8f9;
-    --canvas-2:      #eef2f4;
+    /* Neutral surface scale (warm paper, not cool grey) */
+    --canvas:        #efeee9;
+    --canvas-2:      #e7e4dc;
     --surface:       #ffffff;
-    --sunken:        #edf1f3;
-    --line-subtle:   #ebeff2;
-    --line:          #dce3e8;
-    --line-strong:   #c6d0d6;
+    --sunken:        #e7e4dc;
+    --line-subtle:   #ece9e1;
+    --line:          #dbd8ce;
+    --line-strong:   #c1beb2;
 
     /* Ink (text) */
-    --ink:           #0e1b21;
-    --ink-muted:     #55666f;
-    --ink-subtle:    #8a969d;
+    --ink:           #131414;
+    --ink-muted:     #55575a;
+    --ink-subtle:    #8a8d90;
 
-    /* Brand — teal (trust / competence) */
-    --brand:         #0f766e;
-    --brand-strong:  #0b5d57;
+    /* Brand — near-black. Carries links, focus rings and every plain button.
+       Yellow is never used for text: at #ffd400 it fails contrast on paper. */
+    --brand:         #14161a;
+    --brand-strong:  #000000;
     --on-brand:      #ffffff;
-    --brand-soft:    #e5f1ef;
-    --brand-line:    #bcdcd7;
+    --brand-soft:    #e3e0d6;
+    --brand-line:    #d2cfc3;
 
-    /* Accent — amber (featured / premium) */
-    --accent:        #f59e0b;
-    --accent-soft:   #fbf0db;
-    --accent-text:   #8a5a08;
-    --accent-line:   #ebce9a;
+    /* Accent — hi-vis yellow. Fills only: paid placement and the handful of
+       primary marketing actions (list your business, search, upgrade). */
+    --accent:        #ffd400;
+    --on-accent:     #171400;
+    --accent-soft:   #fff6cc;
+    --accent-text:   #7a5f00;
+    --accent-line:   #f0d878;
 
     /* Semantic */
-    --success:       #16a34a;   /* "Open now" */
-    --success-soft:  #e4f4ea;
-    --success-text:  #157f3b;
-    --danger:        #dc2626;
-    --danger-soft:   #fbe9e8;
-    --danger-text:   #b42318;
+    --success:       #0a7a41;   /* "Open now" */
+    --success-soft:  #e2f3e8;
+    --success-text:  #0a7a41;
+    --danger:        #c0392b;
+    --danger-soft:   #f8e6e3;
+    --danger-text:   #a3301f;
+
+    /* Fixed dark band — header, footer. Same value in both themes. */
+    --header-bg:     #131414;
+    --header-ink:    #efeee9;
+    --header-line:   #2c2d2d;
 }
 
 @media (prefers-color-scheme: dark) {
     :root {
-        --canvas:        #0a1417;
-        --canvas-2:      #0e1a1e;
-        --surface:       #131e22;
-        --sunken:        #0c1519;
-        --line-subtle:   #1e2a2f;
-        --line:          #29373d;
-        --line-strong:   #3a4a51;
+        --canvas:        #131414;
+        --canvas-2:      #1a1b1b;
+        --surface:       #1c1d1d;
+        --sunken:        #202121;
+        --line-subtle:   #242525;
+        --line:          #313333;
+        --line-strong:   #464846;
 
-        --ink:           #e7eef0;
-        --ink-muted:     #98a8b0;
-        --ink-subtle:    #64757d;
+        --ink:           #f1f0ec;
+        --ink-muted:     #a8aaa8;
+        --ink-subtle:    #797c7a;
 
-        --brand:         #2dd4bf;
-        --brand-strong:  #5eead4;
-        --on-brand:      #04211e;
-        --brand-soft:    #10312d;
-        --brand-line:    #1e4842;
+        --brand:         #f1f0ec;
+        --brand-strong:  #ffffff;
+        --on-brand:      #131414;
+        --brand-soft:    #232423;
+        --brand-line:    #363734;
 
-        --accent:        #fbbf24;
-        --accent-soft:   #33280e;
-        --accent-text:   #fbd267;
-        --accent-line:   #4d3d14;
+        --accent:        #ffd400;
+        --on-accent:     #171400;
+        --accent-soft:   #3a2f00;
+        --accent-text:   #ffd400;
+        --accent-line:   #4d3f00;
 
-        --success:       #34d399;
-        --success-soft:  #0f2c20;
-        --success-text:  #4ade80;
-        --danger:        #f87171;
-        --danger-soft:   #33191a;
-        --danger-text:   #fca5a5;
+        --success:       #3ecb7e;
+        --success-soft:  #123322;
+        --success-text:  #57d98f;
+        --danger:        #ef6a58;
+        --danger-soft:   #3a1c17;
+        --danger-text:   #f28671;
+
+        --header-bg:     #131414;
+        --header-ink:    #efeee9;
+        --header-line:   #2c2d2d;
     }
 }
 
 /* Expose tokens to Tailwind utilities (bg-surface, text-ink, border-line, …).
    `inline` keeps the runtime var() reference so light/dark switching works. */
 @theme inline {
-    --font-sans:    'Inter', ui-sans-serif, system-ui, sans-serif;
-    --font-display: 'Bricolage Grotesque', 'Inter', ui-sans-serif, system-ui, sans-serif;
+    --font-sans:    'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
+    --font-display: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
+    --font-mono:    'JetBrains Mono', ui-monospace, 'SFMono-Regular', Menlo, monospace;
 
     --color-canvas:        var(--canvas);
     --color-canvas-2:      var(--canvas-2);
@@ -108,6 +123,7 @@
     --color-brand-line:    var(--brand-line);
 
     --color-accent:        var(--accent);
+    --color-on-accent:     var(--on-accent);
     --color-accent-soft:   var(--accent-soft);
     --color-accent-text:   var(--accent-text);
     --color-accent-line:   var(--accent-line);
@@ -119,9 +135,14 @@
     --color-danger-soft:   var(--danger-soft);
     --color-danger-text:   var(--danger-text);
 
-    /* Soft, cool-tinted elevation — carried mostly by borders, lifted on hover */
-    --shadow-card:  0 1px 2px 0 rgb(13 26 32 / 0.04), 0 1px 3px 0 rgb(13 26 32 / 0.05);
-    --shadow-lift:  0 12px 32px -12px rgb(13 26 32 / 0.18), 0 6px 14px -8px rgb(13 26 32 / 0.10);
+    --color-header-bg:     var(--header-bg);
+    --color-header-ink:    var(--header-ink);
+    --color-header-line:   var(--header-line);
+
+    /* Kept minimal on purpose — Trade Counter reads as flat signage, not
+       elevated cards. --shadow-card is a hairline shadow for real overlays
+       (modals, dropdowns) only; nothing in the page grid uses it. */
+    --shadow-card:  0 1px 2px 0 rgb(19 20 20 / 0.05);
 }
 
 /* ============================================================================
@@ -134,8 +155,8 @@
     }
 
     ::selection {
-        background-color: var(--brand-soft);
-        color: var(--brand-strong);
+        background-color: var(--accent);
+        color: var(--on-accent);
     }
 
     /* Consistent, visible keyboard focus everywhere */
@@ -146,62 +167,142 @@
 }
 
 /* ============================================================================
-   Components — repeated marketplace patterns, kept DRY and cohesive
+   Components — repeated directory patterns, kept DRY and cohesive
    ========================================================================== */
 @layer components {
     .eyebrow {
-        @apply text-xs font-semibold uppercase tracking-[0.16em] text-brand;
+        @apply text-xs font-semibold uppercase tracking-[0.14em] text-ink-subtle;
     }
 
-    /* De-boxed card base: white surface on tinted canvas + hairline border */
+    /* Flat surface: white panel on tinted paper + hairline border. No radius
+       theatrics, no shadow — hierarchy comes from the border and the paper. */
     .surface-card {
-        @apply rounded-xl border border-line bg-surface;
+        @apply rounded-md border border-line bg-surface;
     }
 
-    /* Soft hover: gentle lift + brand-tinted edge (animation removed under reduced-motion) */
+    /* Rows and cards promote their border on hover; nothing lifts or floats. */
     .hover-lift {
-        @apply transition duration-200 ease-out;
+        @apply transition duration-150 ease-out;
     }
     .hover-lift:hover {
-        @apply -translate-y-0.5 border-brand-line shadow-lift;
+        @apply border-line-strong;
     }
 
-    .eyebrow-line {
-        @apply flex items-center gap-3;
+    /* Business row list — shared by every directory listing (home featured,
+       category, city, search, "more X in Y"). `divide-line`, not the
+       fainter `divide-line-subtle`, so each row reads as its own row at a
+       glance instead of the list blurring into one block. */
+    .business-list {
+        @apply divide-y divide-line rounded-md border border-line bg-surface;
     }
 
     /* Pills / filter chips */
     .chip {
-        @apply inline-flex items-center gap-1.5 rounded-full border border-line bg-surface px-3.5 py-1.5 text-sm font-medium text-ink-muted transition duration-200 hover:border-brand-line hover:bg-brand-soft hover:text-brand;
+        @apply inline-flex items-center gap-1.5 rounded-full border border-line bg-surface px-3.5 py-1.5 text-sm font-medium text-ink-muted transition duration-150 hover:border-line-strong hover:text-ink;
     }
     .chip-active {
         @apply border-transparent bg-brand text-on-brand hover:border-transparent hover:bg-brand-strong hover:text-on-brand;
     }
 
+    /* Status — open/closed, the one thing every row leads with. Plain
+       colored text with a lead dot, not a filled pill: a badge repeated
+       down a long list turns into "badge soup" fast, and the dot alone
+       is enough to scan a list for at a glance. */
+    .status-pill {
+        @apply inline-flex items-center gap-1.5 text-sm font-semibold;
+    }
+    .status-pill::before {
+        content: '';
+        @apply inline-block size-1.5 shrink-0 rounded-full;
+    }
+    .status-open {
+        @apply text-success-text;
+    }
+    .status-open::before {
+        @apply bg-success;
+    }
+    .status-shut {
+        @apply text-ink-muted;
+    }
+    .status-shut::before {
+        @apply bg-ink-subtle;
+    }
+
+    /* Paid-placement tag for repeated list rows — same dot + text logic as
+       .status-pill above, so the two sit together without one being boxed
+       and the other not. .featured-flag below (solid fill) is for one-off
+       section-level disclosure, where a single louder stamp is correct. */
+    .featured-tag {
+        @apply inline-flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-accent-text;
+    }
+    .featured-tag::before {
+        content: '';
+        @apply inline-block size-1.5 shrink-0 rounded-full bg-accent;
+    }
+
+    /* Paid-placement flag — solid fill, never a soft tint. The one thing on
+       the page that is unambiguously "someone paid for this." Used once per
+       context (section header, portal stat tile), never repeated down a
+       list — see .featured-tag above for that case. */
+    .featured-flag {
+        @apply inline-flex shrink-0 items-center gap-1 rounded-full bg-accent px-2.5 py-1 text-[11px] font-bold uppercase tracking-wider text-on-accent;
+    }
+
+    /* Row action — a compact icon target instead of a labeled button, so
+       the action doesn't repeat as a filled slab down a long list. Call
+       stays solid since it's the one thing every row wants tapped; View
+       (no phone on file) is the quieter outline case. */
+    .row-action {
+        @apply inline-flex size-10 shrink-0 touch-manipulation items-center justify-center rounded-full transition duration-150 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/70 focus-visible:ring-offset-2 focus-visible:ring-offset-canvas active:translate-y-px;
+    }
+    .row-action-call {
+        @apply bg-brand text-on-brand hover:bg-brand-strong;
+    }
+    .row-action-view {
+        @apply border border-line-strong bg-surface text-ink-muted hover:border-brand hover:text-brand;
+    }
+
     /* Form fields */
     .field {
-        @apply w-full rounded-lg border border-line bg-surface px-3.5 py-2.5 text-sm text-ink placeholder:text-ink-subtle transition focus:border-brand focus:ring-2 focus:ring-brand/25 focus:outline-none;
+        @apply w-full rounded-md border border-line bg-surface px-3.5 py-2.5 text-sm text-ink placeholder:text-ink-subtle transition focus:border-brand focus:ring-2 focus:ring-brand/20 focus:outline-none;
     }
 
-    /* Buttons — use as `btn btn-primary` / `btn btn-ghost` */
+    /* Buttons — `btn btn-primary` (ink fill, the default action, including
+       "call this business"), `btn btn-accent` (yellow, reserved for the
+       handful of top-of-funnel CTAs), `btn btn-ghost` (outlined). */
     .btn {
-        @apply inline-flex items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-sm font-semibold transition duration-200 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/70 focus-visible:ring-offset-2 focus-visible:ring-offset-canvas;
+        @apply inline-flex touch-manipulation items-center justify-center gap-2 rounded-md px-4 py-2.5 text-sm font-semibold transition duration-150 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/70 focus-visible:ring-offset-2 focus-visible:ring-offset-canvas active:translate-y-px;
     }
     .btn-primary {
-        @apply bg-brand text-on-brand shadow-card hover:bg-brand-strong;
+        @apply bg-brand text-on-brand hover:bg-brand-strong;
+    }
+    .btn-accent {
+        @apply bg-accent font-bold uppercase tracking-wide text-on-accent hover:brightness-95;
     }
     .btn-ghost {
-        @apply border border-line bg-surface text-ink hover:border-brand-line hover:bg-brand-soft hover:text-brand;
+        @apply border border-line-strong bg-surface text-ink hover:border-brand hover:bg-canvas-2;
     }
 
-    /* Glassmorphism sticky header */
-    .glass-header {
-        @apply sticky top-0 z-40 border-b border-line/70 bg-canvas/80 backdrop-blur-md backdrop-saturate-150;
+    /* Buttons that sit directly on the accent-yellow surface (the "list
+       your business" panel, the portal upsell) — `--on-accent` is fixed
+       across both themes, same as the yellow behind it, so these never
+       wash out in dark mode the way `.btn-primary`'s theme-swapping ink
+       would (it goes near-white on dark, and white-on-yellow barely reads
+       as a button at all). */
+    .btn-on-accent {
+        @apply bg-on-accent text-accent hover:brightness-125;
     }
-    @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
-        .glass-header {
-            @apply bg-canvas;
-        }
+    .btn-on-accent-ghost {
+        @apply border-2 border-on-accent text-on-accent hover:bg-black/10;
+    }
+
+    /* Fixed dark band — header and footer. Constant across light/dark OS
+       theme; see --header-* tokens above. */
+    .trade-band {
+        @apply bg-header-bg text-header-ink;
+    }
+    .header-bar {
+        @apply sticky top-0 z-40 border-b border-header-line;
     }
 }
 

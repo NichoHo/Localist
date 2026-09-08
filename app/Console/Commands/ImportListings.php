@@ -61,6 +61,7 @@ class ImportListings extends Command
                     'phone' => $data['phone'] ?? null,
                     'website' => $data['website'] ?: null,
                     'email' => $data['email'] ?? null,
+                    'hours' => isset($data['hours']) ? json_decode($data['hours'], true) : null,
                     'lat' => $data['lat'] ?? null,
                     'lng' => $data['lng'] ?? null,
                     'plan_id' => $plans[$plan],
