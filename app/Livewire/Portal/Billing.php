@@ -55,18 +55,17 @@ class Billing extends Component
 
     private function applyCheckoutSession(string $sessionId): void
     {
-        // ponytail: checkout-callback plan sync; production renewals/cancellations need the Cashier webhook
+        // Immediate feedback on return; renewals/cancellations arrive via the webhook (SyncPlanFromSubscription).
         try {
             $session = Cashier::stripe()->checkout->sessions->retrieve($sessionId, ['expand' => ['line_items']]);
             if ($session->payment_status !== 'paid') {
                 return;
             }
 
-            $priceId = $session->line_items->data[0]->price->id ?? null;
-            $planName = array_search($priceId, config('services.stripe.prices'), true);
+            $planId = Plan::idForStripePrice($session->line_items->data[0]->price->id ?? null);
 
-            if ($planName && $this->business) {
-                $this->business->update(['plan_id' => Plan::where('name', $planName)->value('id')]);
+            if ($planId && $this->business) {
+                $this->business->update(['plan_id' => $planId]);
                 $this->dispatch('saved');
             }
         } catch (\Throwable $e) {

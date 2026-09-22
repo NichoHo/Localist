@@ -29,12 +29,12 @@ class BillingTest extends TestCase
         parent::setUp();
 
         $this->free = Plan::create(['name' => 'Free', 'price_monthly' => 0, 'priority_rank' => 0]);
-        $this->featured = Plan::create(['name' => 'Featured', 'price_monthly' => 49, 'priority_rank' => 1]);
-        $category = Category::create(['name' => 'Plumbers', 'slug' => 'plumbers']);
-        $city = City::create(['name' => 'Kuala Lumpur', 'slug' => 'kuala-lumpur']);
+        $this->featured = Plan::create(['name' => 'Featured', 'price_monthly' => 149000, 'priority_rank' => 1]);
+        $category = Category::create(['name' => 'Cafes & Coffee Shops', 'slug' => 'cafes-coffee']);
+        $city = City::create(['name' => 'Jakarta', 'slug' => 'jakarta']);
         $this->owner = User::factory()->create();
         $this->business = Business::create([
-            'name' => 'Zzz Plumbing', 'slug' => 'zzz-plumbing',
+            'name' => 'Zzz Coffee', 'slug' => 'zzz-coffee',
             'category_id' => $category->id, 'city_id' => $city->id,
             'plan_id' => $this->featured->id, 'status' => 'published', 'user_id' => $this->owner->id,
         ]);
@@ -57,17 +57,37 @@ class BillingTest extends TestCase
             ->assertHasErrors('billing');
     }
 
+    public function test_stripe_webhook_syncs_plan_from_subscription(): void
+    {
+        config(['services.stripe.prices.Featured' => 'price_featured', 'cashier.webhook.secret' => null]);
+        $this->owner->forceFill(['stripe_id' => 'cus_123'])->save();
+        $this->business->update(['plan_id' => $this->free->id]);
+
+        $payload = fn (string $type, string $status) => ['type' => $type, 'data' => ['object' => [
+            'id' => 'sub_123', 'customer' => 'cus_123', 'status' => $status, 'cancel_at_period_end' => false,
+            'items' => ['data' => [['id' => 'si_1', 'price' => ['id' => 'price_featured', 'product' => 'prod_1'], 'quantity' => 1]]],
+        ]]];
+
+        // Subscription created in Stripe (checkout, or manually in the dashboard) → paid plan.
+        $this->postJson('/stripe/webhook', $payload('customer.subscription.updated', 'active'))->assertOk();
+        $this->assertEquals($this->featured->id, $this->business->fresh()->plan_id);
+
+        // Cancelled or expired in Stripe → back to Free without anyone visiting the portal.
+        $this->postJson('/stripe/webhook', $payload('customer.subscription.deleted', 'canceled'))->assertOk();
+        $this->assertEquals($this->free->id, $this->business->fresh()->plan_id);
+    }
+
     public function test_downgrade_to_free_changes_plan_and_ranking(): void
     {
         Business::create([
-            'name' => 'Aaa Plumbing', 'slug' => 'aaa-plumbing',
+            'name' => 'Aaa Coffee', 'slug' => 'aaa-coffee',
             'category_id' => $this->business->category_id, 'city_id' => $this->business->city_id,
             'plan_id' => $this->free->id, 'status' => 'published',
         ]);
 
         // Featured "Zzz" outranks free "Aaa" before the downgrade...
-        $before = $this->get('/kuala-lumpur/plumbers')->getContent();
-        $this->assertTrue(strpos($before, 'Zzz Plumbing') < strpos($before, 'Aaa Plumbing'));
+        $before = $this->get('/jakarta/cafes-coffee')->getContent();
+        $this->assertTrue(strpos($before, 'Zzz Coffee') < strpos($before, 'Aaa Coffee'));
 
         Livewire::actingAs($this->owner)->test(Billing::class)
             ->call('downgradeToFree')
@@ -76,7 +96,7 @@ class BillingTest extends TestCase
         $this->assertEquals($this->free->id, $this->business->fresh()->plan_id);
 
         // ...and drops below it after: plan change changes ranking.
-        $after = $this->get('/kuala-lumpur/plumbers')->getContent();
-        $this->assertTrue(strpos($after, 'Aaa Plumbing') < strpos($after, 'Zzz Plumbing'));
+        $after = $this->get('/jakarta/cafes-coffee')->getContent();
+        $this->assertTrue(strpos($after, 'Aaa Coffee') < strpos($after, 'Zzz Coffee'));
     }
 }

@@ -18,13 +18,21 @@ class EditListing extends Component
     public ?Business $business = null;
 
     public string $name = '';
+
     public string $description = '';
+
     public string $category_id = '';
+
     public string $city_id = '';
+
     public string $address = '';
+
     public string $phone = '';
+
     public string $website = '';
+
     public string $email = '';
+
     public array $hours = [];
 
     public const DAYS = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'];

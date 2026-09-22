@@ -20,7 +20,7 @@ class Seo
                 'streetAddress' => $business->address,
                 'addressLocality' => $business->city->name,
                 'addressRegion' => $business->city->region,
-                'addressCountry' => 'MY',
+                'addressCountry' => 'ID',
             ],
         ];
 

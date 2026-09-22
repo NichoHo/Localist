@@ -20,11 +20,11 @@ class SeoTest extends TestCase
         parent::setUp();
 
         $plan = Plan::create(['name' => 'Free', 'priority_rank' => 0]);
-        $category = Category::create(['name' => 'Plumbers', 'slug' => 'plumbers']);
-        $city = City::create(['name' => 'Kuala Lumpur', 'slug' => 'kuala-lumpur', 'region' => 'Federal Territory']);
+        $category = Category::create(['name' => 'Cafes & Coffee Shops', 'slug' => 'cafes-coffee']);
+        $city = City::create(['name' => 'Jakarta', 'slug' => 'jakarta', 'region' => 'DKI Jakarta']);
         $this->business = Business::create([
-            'name' => 'Rapid Plumbing', 'slug' => 'rapid-plumbing', 'description' => 'Pipes fixed fast.',
-            'address' => '1, Jalan Test', 'phone' => '012-345 6789', 'lat' => 3.1, 'lng' => 101.7,
+            'name' => 'Sunrise Coffee', 'slug' => 'sunrise-coffee', 'description' => 'Fresh coffee, brewed fast.',
+            'address' => 'Jl. Test No. 1', 'phone' => '0812-3456-7890', 'lat' => -6.2, 'lng' => 106.8,
             'hours' => ['mon' => ['open' => '09:00', 'close' => '18:00', 'closed' => false], 'sun' => ['closed' => true]],
             'category_id' => $category->id, 'city_id' => $city->id, 'plan_id' => $plan->id, 'status' => 'published',
         ]);
@@ -45,36 +45,36 @@ class SeoTest extends TestCase
 
     public function test_business_page_has_valid_local_business_and_breadcrumbs(): void
     {
-        $html = $this->get('/business/rapid-plumbing')->assertOk()->getContent();
+        $html = $this->get('/business/sunrise-coffee')->assertOk()->getContent();
         $blocks = collect($this->jsonLd($html))->keyBy('@type');
 
         $lb = $blocks['LocalBusiness'];
-        $this->assertEquals('Rapid Plumbing', $lb['name']);
-        $this->assertEquals('Kuala Lumpur', $lb['address']['addressLocality']);
-        $this->assertEquals(3.1, $lb['geo']['latitude']);
+        $this->assertEquals('Sunrise Coffee', $lb['name']);
+        $this->assertEquals('Jakarta', $lb['address']['addressLocality']);
+        $this->assertEquals(-6.2, $lb['geo']['latitude']);
         // Closed days excluded, open days present.
         $this->assertCount(1, $lb['openingHoursSpecification']);
         $this->assertEquals('Monday', $lb['openingHoursSpecification'][0]['dayOfWeek']);
 
         $crumbs = $blocks['BreadcrumbList']['itemListElement'];
         $this->assertCount(4, $crumbs);
-        $this->assertEquals(['Home', 'Kuala Lumpur', 'Plumbers', 'Rapid Plumbing'], array_column($crumbs, 'name'));
+        $this->assertEquals(['Home', 'Jakarta', 'Cafes & Coffee Shops', 'Sunrise Coffee'], array_column($crumbs, 'name'));
         $this->assertEquals([1, 2, 3, 4], array_column($crumbs, 'position'));
     }
 
     public function test_city_category_page_has_item_list_and_breadcrumbs(): void
     {
-        $html = $this->get('/kuala-lumpur/plumbers')->assertOk()->getContent();
+        $html = $this->get('/jakarta/cafes-coffee')->assertOk()->getContent();
         $blocks = collect($this->jsonLd($html))->keyBy('@type');
 
-        $this->assertEquals('Rapid Plumbing', $blocks['ItemList']['itemListElement'][0]['name']);
+        $this->assertEquals('Sunrise Coffee', $blocks['ItemList']['itemListElement'][0]['name']);
         $this->assertArrayHasKey('BreadcrumbList', $blocks);
     }
 
     public function test_public_pages_have_self_canonical_and_search_is_noindex(): void
     {
-        $this->get('/business/rapid-plumbing')
-            ->assertSee('<link rel="canonical" href="'.url('/business/rapid-plumbing').'">', false);
+        $this->get('/business/sunrise-coffee')
+            ->assertSee('<link rel="canonical" href="'.url('/business/sunrise-coffee').'">', false);
         $this->get('/search?q=x')->assertSee('<meta name="robots" content="noindex">', false);
     }
 
@@ -91,7 +91,7 @@ class SeoTest extends TestCase
         $this->assertCount(4, $index->sitemap); // businesses, categories, cities, cities-2
 
         $businesses = simplexml_load_file($dir.'/sitemap-businesses.xml');
-        $this->assertEquals(url('/business/rapid-plumbing'), (string) $businesses->url[0]->loc);
+        $this->assertEquals(url('/business/sunrise-coffee'), (string) $businesses->url[0]->loc);
 
         array_map('unlink', glob($dir.'/*.xml'));
         rmdir($dir);

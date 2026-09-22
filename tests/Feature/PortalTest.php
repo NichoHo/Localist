@@ -16,12 +16,9 @@ use Illuminate\Support\Facades\Storage;
 use Livewire\Livewire;
 use Tests\TestCase;
 
-// 1x1 transparent PNG so image validation passes without the GD extension.
-const TINY_PNG = 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==';
-
-function fakeImage(string $name): UploadedFile
+function fakeImage(string $name, int $width = 10): UploadedFile
 {
-    return UploadedFile::fake()->createWithContent($name, base64_decode(TINY_PNG));
+    return UploadedFile::fake()->image($name, $width, 10);
 }
 
 class PortalTest extends TestCase
@@ -37,11 +34,11 @@ class PortalTest extends TestCase
         parent::setUp();
 
         $plan = Plan::create(['name' => 'Free', 'priority_rank' => 0, 'max_photos' => 3]);
-        $category = Category::create(['name' => 'Plumbers', 'slug' => 'plumbers']);
-        $city = City::create(['name' => 'Kuala Lumpur', 'slug' => 'kuala-lumpur', 'region' => 'Federal Territory']);
+        $category = Category::create(['name' => 'Cafes & Coffee Shops', 'slug' => 'cafes-coffee']);
+        $city = City::create(['name' => 'Jakarta', 'slug' => 'jakarta', 'region' => 'DKI Jakarta']);
         $this->owner = User::factory()->create();
         $this->business = Business::create([
-            'name' => 'Rapid Plumbing', 'slug' => 'rapid-plumbing', 'description' => 'Pipes fixed fast.',
+            'name' => 'Sunrise Coffee', 'slug' => 'sunrise-coffee', 'description' => 'Fresh coffee, brewed fast.',
             'category_id' => $category->id, 'city_id' => $city->id, 'plan_id' => $plan->id, 'status' => 'published',
         ]);
     }
@@ -69,13 +66,13 @@ class PortalTest extends TestCase
         $this->business->update(['user_id' => $this->owner->id]);
 
         Livewire::actingAs($this->owner)->test(EditListing::class)
-            ->set('description', 'Now with 24/7 emergency callouts.')
-            ->set('phone', '012-345 6789')
+            ->set('description', 'Now with weekend brunch hours.')
+            ->set('phone', '0812-3456-7890')
             ->call('save')
             ->assertHasNoErrors()
             ->assertDispatched('saved');
 
-        $this->assertEquals('Now with 24/7 emergency callouts.', $this->business->fresh()->description);
+        $this->assertEquals('Now with weekend brunch hours.', $this->business->fresh()->description);
     }
 
     public function test_slug_change_creates_working_301(): void
@@ -83,18 +80,18 @@ class PortalTest extends TestCase
         $this->business->update(['user_id' => $this->owner->id]);
 
         Livewire::actingAs($this->owner)->test(EditListing::class)
-            ->set('name', 'Rapid Plumbing & Sons')
+            ->set('name', 'Sunrise Coffee & Roasters')
             ->call('save')
             ->assertHasNoErrors();
 
-        $this->assertEquals('rapid-plumbing-sons', $this->business->fresh()->slug);
-        $this->assertDatabaseHas('redirects', ['from_path' => '/business/rapid-plumbing']);
+        $this->assertEquals('sunrise-coffee-roasters', $this->business->fresh()->slug);
+        $this->assertDatabaseHas('redirects', ['from_path' => '/business/sunrise-coffee']);
 
         // The spec's one correctness check: old path → 301 → new path, never 404.
-        $this->get('/business/rapid-plumbing')
+        $this->get('/business/sunrise-coffee')
             ->assertStatus(301)
-            ->assertRedirect('/business/rapid-plumbing-sons');
-        $this->get('/business/rapid-plumbing-sons')->assertOk();
+            ->assertRedirect('/business/sunrise-coffee-roasters');
+        $this->get('/business/sunrise-coffee-roasters')->assertOk();
     }
 
     public function test_photo_upload_respects_plan_limit(): void
@@ -127,6 +124,49 @@ class PortalTest extends TestCase
         $component->call('reorder', ["$second", "$first"]);
 
         $this->assertEquals([$second, $first], $this->business->media()->pluck('id')->all());
+    }
+
+    public function test_photo_upload_is_resized_and_stored_as_webp(): void
+    {
+        Storage::fake('public');
+        $this->business->update(['user_id' => $this->owner->id]);
+
+        Livewire::actingAs($this->owner)->test(Photos::class)
+            ->set('upload', fakeImage('wide.jpg', 3000))
+            ->assertHasNoErrors();
+
+        $path = $this->business->media()->value('path');
+        $this->assertStringEndsWith('.webp', $path);
+        Storage::disk('public')->assertExists($path);
+
+        [$width] = getimagesizefromstring(Storage::disk('public')->get($path));
+        $this->assertEquals(1600, $width);
+    }
+
+    public function test_photo_upload_rejects_undecodable_image(): void
+    {
+        Storage::fake('public');
+        $this->business->update(['user_id' => $this->owner->id]);
+
+        // Valid PNG signature, garbage body: passes MIME sniffing, fails GD decoding.
+        $bytes = "\x89PNG\r\n\x1a\n".str_repeat('x', 64);
+        Livewire::actingAs($this->owner)->test(Photos::class)
+            ->set('upload', UploadedFile::fake()->createWithContent('bad.png', $bytes))
+            ->assertHasErrors('upload');
+
+        $this->assertEquals(0, $this->business->media()->count());
+    }
+
+    public function test_photo_upload_rejects_svg(): void
+    {
+        Storage::fake('public');
+        $this->business->update(['user_id' => $this->owner->id]);
+
+        Livewire::actingAs($this->owner)->test(Photos::class)
+            ->set('upload', UploadedFile::fake()->createWithContent('x.svg', '<svg xmlns="http://www.w3.org/2000/svg"/>'))
+            ->assertHasErrors('upload');
+
+        $this->assertEquals(0, $this->business->media()->count());
     }
 
     public function test_leads_can_be_toggled_read(): void

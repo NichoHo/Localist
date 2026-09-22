@@ -10,7 +10,7 @@
             </span>
             <div>
                 <h1 class="font-display text-3xl font-bold text-ink sm:text-4xl">{{ $category->name }}</h1>
-                <p class="mt-1 text-ink-muted"><span class="font-mono font-medium text-ink">{{ number_format($businesses->total()) }}</span> businesses across Malaysia</p>
+                <p class="mt-1 text-ink-muted"><span class="font-mono font-medium text-ink">{{ number_format($businesses->total()) }}</span> businesses across Indonesia</p>
             </div>
         </div>
 

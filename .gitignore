@@ -29,3 +29,6 @@ Thumbs.db
 /skills-lock.json
 CLAUDE.md
 .mcp.json
+
+# Raw source-dataset extract for database/seed/fetch_indonesia_listings.py (79MB, not source)
+/database/seed/raw

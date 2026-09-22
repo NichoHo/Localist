@@ -1,4 +1,4 @@
-<x-public-layout :title="$business->name.' | '.$business->category->name.' in '.$business->city->name.' | Localist'" :description="Str::limit($business->description, 155)">
+<x-public-layout :title="$business->name.' | '.$business->category->name.' in '.$business->city->name.' | Localist'" :description="Str::limit($business->description ?: $business->category->name.' in '.$business->city->name.', Indonesia.', 155)">
     <x-json-ld :data="\App\Services\Seo::localBusiness($business)" />
     <x-json-ld :data="\App\Services\Seo::breadcrumbs([
         ['Home', route('home')],
@@ -35,9 +35,11 @@
                     <a href="#enquire" class="btn btn-ghost">Send an enquiry</a>
                 </div>
 
-                <div class="mt-6 max-w-[45rem]">
-                    <p class="text-[1.0625rem] leading-relaxed text-ink-muted">{{ $business->description }}</p>
-                </div>
+                @if ($business->description)
+                    <div class="mt-6 max-w-[45rem]">
+                        <p class="text-[1.0625rem] leading-relaxed text-ink-muted">{{ $business->description }}</p>
+                    </div>
+                @endif
 
                 @if ($business->media->isNotEmpty())
                     <div class="mt-8 grid grid-cols-2 gap-3 sm:grid-cols-3">
@@ -107,7 +109,7 @@
                             <span @class(['status-pill', 'status-open' => $business->isOpenNow(), 'status-shut' => ! $business->isOpenNow()])>{{ $business->openStatusLabel() }}</span>
                         </div>
                         <dl class="mt-4 space-y-2.5 text-sm">
-                            @php $today = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'][now('Asia/Kuala_Lumpur')->dayOfWeekIso - 1]; @endphp
+                            @php $today = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'][now($business->city->timezone ?? 'Asia/Jakarta')->dayOfWeekIso - 1]; @endphp
                             @foreach ($business->hours as $day => $slot)
                                 <div @class(['flex items-center justify-between gap-4 rounded px-2 -mx-2', 'bg-canvas-2' => $day === $today])>
                                     <dt @class(['text-xs font-medium uppercase tracking-wide', 'text-ink' => $day === $today, 'text-ink-subtle' => $day !== $today])>{{ ucfirst($day) }}</dt>
@@ -128,6 +130,8 @@
                     @else
                         <form method="post" action="{{ route('business.enquire', $business) }}" class="mt-4 space-y-3">
                             @csrf
+                            {{-- Honeypot: humans never see it, bots fill it. --}}
+                            <input name="website" tabindex="-1" autocomplete="off" aria-hidden="true" class="hidden">
                             <div>
                                 <label for="enq-name" class="sr-only">Your name</label>
                                 <input id="enq-name" name="name" value="{{ old('name') }}" placeholder="Your name" required class="field">
@@ -164,4 +168,5 @@
             </aside>
         </div>
     </div>
+    <script>navigator.sendBeacon('{{ route('business.view', $business) }}');</script>
 </x-public-layout>

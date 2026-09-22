@@ -36,13 +36,17 @@ class ImportListings extends Command
             $data = array_combine($header, $row);
 
             $categories[$data['category']] ??= Category::firstOrCreate(
-                ['slug' => Str::slug($data['category'])],
+                ['slug' => $data['category_slug'] ?? Str::slug($data['category'])],
                 ['name' => $data['category']]
             )->id;
 
             $cities[$data['city']] ??= City::firstOrCreate(
                 ['slug' => Str::slug($data['city'])],
-                ['name' => $data['city'], 'region' => $data['region'] ?? null, 'lat' => $data['lat'] ?? null, 'lng' => $data['lng'] ?? null]
+                [
+                    'name' => $data['city'], 'region' => $data['region'] ?? null,
+                    'lat' => $data['lat'] ?? null, 'lng' => $data['lng'] ?? null,
+                    'timezone' => $data['timezone'] ?? 'Asia/Jakarta',
+                ]
             )->id;
 
             $cityId = $cities[$data['city']];
@@ -51,10 +55,24 @@ class ImportListings extends Command
             $bucket = crc32($data['name']) % 100;
             $plan = $bucket < 2 ? 'Premium' : ($bucket < 10 ? 'Featured' : 'Free');
 
+            // slug is globally unique, but real chains (e.g. "Shop & Drive") repeat the
+            // same name across many cities, and open POI data has near-duplicate rows
+            // (slightly different punctuation) for the same place in the same city.
+            // Escalate: plain name -> +city -> +city+counter, until it's free.
+            // A non-Latin-script name (e.g. Japanese katakana) slugs to '' — fall back
+            // to the category so the slug is never empty.
+            $base = Str::slug($data['name']) ?: Str::slug($data['category']);
+            $slug = $base;
+            for ($n = 2; Business::where('slug', $slug)
+                ->where(fn ($q) => $q->where('name', '!=', $data['name'])->orWhere('city_id', '!=', $cityId))
+                ->exists(); $n++) {
+                $slug = $base.'-'.($n === 2 ? Str::slug($data['city']) : $n);
+            }
+
             $business = Business::updateOrCreate(
                 ['name' => $data['name'], 'city_id' => $cityId],
                 [
-                    'slug' => Str::slug($data['name']),
+                    'slug' => $slug,
                     'category_id' => $categories[$data['category']],
                     'description' => $data['description'] ?? null,
                     'address' => $data['address'] ?? null,

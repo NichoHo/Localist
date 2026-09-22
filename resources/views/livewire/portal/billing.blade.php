@@ -25,7 +25,7 @@
                             <span class="featured-flag">Ranks higher</span>
                         @endif
                     </div>
-                    <p class="mt-2 text-2xl font-bold tabular-nums text-ink">RM{{ $plan->price_monthly }}<span class="text-sm font-normal text-ink-muted">/mo</span></p>
+                    <p class="mt-2 text-2xl font-bold tabular-nums text-ink">Rp{{ number_format($plan->price_monthly, 0, ',', '.') }}<span class="text-sm font-normal text-ink-muted">/mo</span></p>
                     <ul class="mt-3 flex-1 space-y-1.5 text-sm text-ink-muted">
                         <li>Up to {{ $plan->max_photos }} photos</li>
                         <li>{{ $plan->allows_website ? 'Website link shown' : 'No website link' }}</li>

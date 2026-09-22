@@ -28,11 +28,11 @@ class Phase4Test extends TestCase
         parent::setUp();
 
         $plan = Plan::create(['name' => 'Free', 'priority_rank' => 0]);
-        $category = Category::create(['name' => 'Plumbers', 'slug' => 'plumbers']);
-        $city = City::create(['name' => 'Kuala Lumpur', 'slug' => 'kuala-lumpur']);
+        $category = Category::create(['name' => 'Cafes & Coffee Shops', 'slug' => 'cafes-coffee']);
+        $city = City::create(['name' => 'Jakarta', 'slug' => 'jakarta']);
         $this->owner = User::factory()->create();
         $this->business = Business::create([
-            'name' => 'Rapid Plumbing', 'slug' => 'rapid-plumbing', 'description' => 'Pipes fixed fast.',
+            'name' => 'Sunrise Coffee', 'slug' => 'sunrise-coffee', 'description' => 'Fresh coffee, brewed fast.',
             'category_id' => $category->id, 'city_id' => $city->id, 'plan_id' => $plan->id,
             'status' => 'published', 'user_id' => $this->owner->id,
         ]);
@@ -40,7 +40,7 @@ class Phase4Test extends TestCase
 
     public function test_public_pages_are_cacheable_and_portal_is_not(): void
     {
-        $public = $this->get('/business/rapid-plumbing')->assertOk();
+        $public = $this->get('/business/sunrise-coffee')->assertOk();
         $this->assertStringContainsString('public', $public->headers->get('Cache-Control'));
         $this->assertStringContainsString('max-age=600', $public->headers->get('Cache-Control'));
         $this->assertNotNull($public->headers->get('ETag'));
@@ -59,8 +59,8 @@ class Phase4Test extends TestCase
             ->assertHasNoErrors();
 
         Queue::assertPushed(PurgeCloudflare::class, function (PurgeCloudflare $job) {
-            return in_array(route('business', 'rapid-plumbing'), $job->urls)
-                && in_array(url('kuala-lumpur/plumbers'), $job->urls);
+            return in_array(route('business', 'sunrise-coffee'), $job->urls)
+                && in_array(url('jakarta/cafes-coffee'), $job->urls);
         });
     }
 
@@ -79,14 +79,14 @@ class Phase4Test extends TestCase
         $this->business->update(['status' => 'pending']);
         $admin = User::factory()->create(['role' => 'admin']);
 
-        $this->get('/business/rapid-plumbing')->assertNotFound();
+        $this->get('/business/sunrise-coffee')->assertNotFound();
 
         Livewire::actingAs($admin)->test(Listings::class)
-            ->assertSee('Rapid Plumbing')
+            ->assertSee('Sunrise Coffee')
             ->call('approve', $this->business->id);
 
         $this->assertEquals('published', $this->business->fresh()->status);
-        $this->get('/business/rapid-plumbing')->assertOk();
+        $this->get('/business/sunrise-coffee')->assertOk();
         Queue::assertPushed(PurgeCloudflare::class);
     }
 
@@ -94,5 +94,12 @@ class Phase4Test extends TestCase
     {
         $this->get('/admin')->assertRedirect('/login');
         $this->actingAs($this->owner)->get('/admin')->assertForbidden();
+    }
+
+    public function test_pulse_dashboard_is_admin_only(): void
+    {
+        $this->get('/pulse')->assertForbidden();
+        $this->actingAs($this->owner)->get('/pulse')->assertForbidden();
+        $this->actingAs(User::factory()->create(['role' => 'admin']))->get('/pulse')->assertOk();
     }
 }

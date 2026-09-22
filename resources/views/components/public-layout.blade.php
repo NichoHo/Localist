@@ -1,4 +1,4 @@
-@props(['title' => 'Localist | Find trusted local services', 'description' => 'Browse trusted local service businesses across Malaysia.', 'noindex' => false])
+@props(['title' => 'Localist | Find trusted local businesses', 'description' => 'Browse trusted local businesses across Indonesia.', 'noindex' => false])
 
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
@@ -43,7 +43,7 @@
 
             <form action="{{ route('search') }}" method="get" class="relative hidden max-w-md flex-1 md:block">
                 <label for="header-search" class="sr-only">Search local services</label>
-                <input id="header-search" type="search" name="q" value="{{ request('q') }}" placeholder="Search plumbers, electricians, cleaners…"
+                <input id="header-search" type="search" name="q" value="{{ request('q') }}" placeholder="Search restaurants, cafes, salons…"
                     class="w-full rounded border border-header-line bg-black/20 px-3.5 py-2 text-sm text-header-ink placeholder:text-header-ink/45 transition focus:border-accent focus:outline-none">
             </form>
 
@@ -72,7 +72,7 @@
                     <div class="flex items-center gap-2.5">
                         <span class="font-display text-lg font-bold tracking-tight text-header-ink">Localist</span>
                     </div>
-                    <p class="mt-4 max-w-xs text-sm leading-relaxed text-header-ink/60">Find and compare trusted local service businesses across Malaysia. A demo directory built with synthetic data.</p>
+                    <p class="mt-4 max-w-xs text-sm leading-relaxed text-header-ink/60">Find and compare local businesses across Indonesia. A portfolio project built on real, openly-licensed listing data; most listings are unclaimed until their owner steps in.</p>
                 </div>
                 <div>
                     <p class="text-xs font-semibold uppercase tracking-[0.14em] text-header-ink/50">Popular categories</p>
@@ -99,7 +99,7 @@
                 </div>
             </div>
             <div class="mt-12 flex flex-col gap-2 border-t border-header-line pt-6 text-sm text-header-ink/45 sm:flex-row sm:items-center sm:justify-between">
-                <p>&copy; {{ date('Y') }} Localist. Demo project — synthetic data.</p>
+                <p>&copy; {{ date('Y') }} Localist. Portfolio project, real open-data listings.</p>
                 <p>Built with Laravel, Livewire &amp; Tailwind.</p>
             </div>
         </div>

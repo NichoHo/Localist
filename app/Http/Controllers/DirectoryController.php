@@ -71,7 +71,6 @@ class DirectoryController extends Controller
     public function show(Business $business)
     {
         abort_unless($business->status === 'published', 404);
-        $business->increment('views_count');
         $business->load(['category', 'city', 'plan', 'media']);
 
         return view('directory.business', [
@@ -98,8 +97,20 @@ class DirectoryController extends Controller
         return view('directory.search', ['q' => $q, 'businesses' => $businesses]);
     }
 
+    public function view(Business $business)
+    {
+        $business->increment('views_count');
+
+        return response()->noContent();
+    }
+
     public function enquire(Business $business, Request $request)
     {
+        // ponytail: honeypot only; swap for Cloudflare Turnstile if bots learn to skip hidden fields
+        if ($request->filled('website')) {
+            return back()->with('enquiry_sent', true);
+        }
+
         $data = $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'email', 'max:255'],

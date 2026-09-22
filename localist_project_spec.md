@@ -4,6 +4,8 @@
 
 > **Internal note (delete before sharing publicly):** This project is built to demonstrate the exact stack and architecture a Laravel + Livewire directory job asks for, a public programmatic directory, a Livewire/Alpine management portal, Cloudflare in front, and technical SEO. Every requirement below maps to something a client can see on a screen-share. Build it in the phase order given so there's always a demoable slice.
 
+> **Post-launch pivot (2026-09-17):** the plan below was written and built against 5,000 synthetic Malaysian trade listings (plumbers, electricians, and similar). Real trade data at any usable volume doesn't exist in open datasets, so the seed was replaced with ~5,700 real Indonesian businesses (restaurants, cafes, salons, clinics, hotels, and similar) pulled from Foursquare Open Source Places. The architecture below (data model, portal, SEO, caching) is unchanged; only the seed data, category taxonomy, city list, currency, and copy moved from synthetic/Malaysia to real/Indonesia. See `database/seed/fetch_indonesia_listings.py`.
+
 ---
 
 ## 1. Concept

@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Carbon;
 
 class Business extends Model
 {
@@ -70,11 +71,12 @@ class Business extends Model
 
     private const DAY_KEYS = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'];
 
-    // Stored hours are Malaysia wall-clock time; the app's own clock (config/app.php) is UTC,
-    // so every comparison needs to happen in the business's own timezone, not the server's.
-    private function localNow(): \Illuminate\Support\Carbon
+    // Stored hours are the business's own local wall-clock time; the app's clock
+    // (config/app.php) is UTC, and Indonesia spans three zones (WIB/WITA/WIT),
+    // so every comparison needs the business's city's own timezone, not a fixed one.
+    private function localNow(): Carbon
     {
-        return now('Asia/Kuala_Lumpur');
+        return now($this->city->timezone ?? 'Asia/Jakarta');
     }
 
     public function isOpenNow(): bool
@@ -114,6 +116,7 @@ class Business extends Model
                 if ($date->format('H:i') < $slot['open']) {
                     return 'Opens '.$slot['open'].' today';
                 }
+
                 continue; // already past close today, keep looking
             }
 
