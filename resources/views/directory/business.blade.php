@@ -44,7 +44,7 @@
                 @if ($business->media->isNotEmpty())
                     <div class="mt-8 grid grid-cols-2 gap-3 sm:grid-cols-3">
                         @foreach ($business->media as $photo)
-                            <img src="{{ Storage::url($photo->path) }}" alt="{{ $photo->alt }}" loading="lazy"
+                            <img src="{{ Storage::disk(config('filesystems.photo_disk'))->url($photo->path) }}" alt="{{ $photo->alt }}" loading="lazy"
                                 class="aspect-square w-full rounded-md border border-line object-cover">
                         @endforeach
                     </div>

@@ -58,7 +58,7 @@ class Listings extends Component
         return view('livewire.admin.listings', [
             'businesses' => Business::with(['category', 'city', 'plan', 'user'])
                 ->when($this->status !== 'all', fn ($q) => $q->where('status', $this->status))
-                ->when($this->search, fn ($q) => $q->where('name', 'like', "%{$this->search}%"))
+                ->when($this->search, fn ($q) => $q->whereLike('name', "%{$this->search}%"))
                 ->latest('updated_at')
                 ->paginate(20),
             'counts' => Business::selectRaw('status, COUNT(*) as total')->groupBy('status')->pluck('total', 'status'),

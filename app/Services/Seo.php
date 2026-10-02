@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\Business;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Storage;
 
 class Seo
 {
@@ -37,7 +38,7 @@ class Seo
         }
 
         if ($business->relationLoaded('media') && $business->media->isNotEmpty()) {
-            $data['image'] = $business->media->map(fn ($m) => asset('storage/'.$m->path))->all();
+            $data['image'] = $business->media->map(fn ($m) => Storage::disk(config('filesystems.photo_disk'))->url($m->path))->all();
         }
 
         if ($business->hours) {

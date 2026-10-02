@@ -89,8 +89,8 @@ class DirectoryController extends Controller
 
         $businesses = Business::published()->ranked()
             ->when($q, fn ($query) => $query->where(fn ($w) => $w
-                ->where('businesses.name', 'like', "%$q%")
-                ->orWhere('businesses.description', 'like', "%$q%")))
+                ->whereLike('businesses.name', "%$q%")
+                ->orWhereLike('businesses.description', "%$q%")))
             ->with(['category', 'city', 'plan'])
             ->paginate(24)->withQueryString();
 

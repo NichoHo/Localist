@@ -15,6 +15,9 @@ return [
 
     'default' => env('FILESYSTEM_DISK', 'local'),
 
+    // Disk for uploaded listing photos. Set PHOTO_DISK=s3 (Cloudflare R2) where the app disk is ephemeral.
+    'photo_disk' => env('PHOTO_DISK', 'public'),
+
     /*
     |--------------------------------------------------------------------------
     | Filesystem Disks

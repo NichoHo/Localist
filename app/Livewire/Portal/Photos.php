@@ -43,7 +43,7 @@ class Photos extends Component
         }
 
         $path = 'photos/'.$this->business->id.'/'.Str::uuid().'.webp';
-        Storage::disk('public')->put($path, $webp);
+        Storage::disk(config('filesystems.photo_disk'))->put($path, $webp);
 
         $this->business->media()->create([
             'path' => $path,
@@ -86,7 +86,7 @@ class Photos extends Component
     public function delete(int $mediaId): void
     {
         $media = $this->business->media()->findOrFail($mediaId);
-        Storage::disk('public')->delete($media->path);
+        Storage::disk(config('filesystems.photo_disk'))->delete($media->path);
         $media->delete();
     }
 

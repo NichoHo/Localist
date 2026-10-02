@@ -17,9 +17,9 @@ RUN npm run build
 
 # --- Runtime ---
 FROM php:8.3-apache
-RUN apt-get update && apt-get install -y --no-install-recommends libpng-dev libjpeg-dev libfreetype6-dev libwebp-dev \
+RUN apt-get update && apt-get install -y --no-install-recommends libpng-dev libjpeg-dev libfreetype6-dev libwebp-dev libpq-dev \
     && docker-php-ext-configure gd --with-jpeg --with-freetype --with-webp \
-    && docker-php-ext-install pdo_mysql gd exif opcache bcmath \
+    && docker-php-ext-install pdo_mysql pdo_pgsql gd exif opcache bcmath \
     && a2enmod rewrite headers \
     && rm -rf /var/lib/apt/lists/*
 
@@ -40,6 +40,7 @@ php artisan route:cache
 php artisan view:cache
 php artisan migrate --force
 php artisan storage:link || true
+php artisan sitemap:generate || true
 exec apache2-foreground
 EOF
 RUN chmod +x /usr/local/bin/start.sh

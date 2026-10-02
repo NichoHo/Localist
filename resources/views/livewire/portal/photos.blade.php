@@ -42,7 +42,7 @@
                         x-on:dragover.prevent
                         x-on:drop.prevent="drop({{ $photo->id }})"
                         class="group relative cursor-move overflow-hidden rounded-xl border border-line">
-                        <img src="{{ Storage::url($photo->path) }}" alt="{{ $photo->alt }}" class="aspect-square w-full object-cover">
+                        <img src="{{ Storage::disk(config('filesystems.photo_disk'))->url($photo->path) }}" alt="{{ $photo->alt }}" class="aspect-square w-full object-cover">
                         <button wire:click="delete({{ $photo->id }})" wire:confirm="Delete this photo?"
                             class="absolute right-2 top-2 hidden rounded-lg bg-danger px-2 py-1 text-xs font-semibold text-white shadow-card group-hover:block">
                             Delete
