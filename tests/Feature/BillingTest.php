@@ -10,6 +10,8 @@ use App\Models\Plan;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
+use Stripe\ApiRequestor;
+use Stripe\HttpClient\ClientInterface;
 use Tests\TestCase;
 
 class BillingTest extends TestCase
@@ -87,7 +89,7 @@ class BillingTest extends TestCase
         ]);
 
         // Records every Stripe call and fails it, so we see where the click went without the network.
-        $client = new class implements \Stripe\HttpClient\ClientInterface
+        $client = new class implements ClientInterface
         {
             public array $urls = [];
 
@@ -98,7 +100,7 @@ class BillingTest extends TestCase
                 return ['{"error":{"message":"stub"}}', 400, []];
             }
         };
-        \Stripe\ApiRequestor::setHttpClient($client);
+        ApiRequestor::setHttpClient($client);
 
         Livewire::actingAs($this->owner)->test(Billing::class)
             ->call('checkout', $this->featured->id)
@@ -109,7 +111,7 @@ class BillingTest extends TestCase
             $this->assertStringNotContainsString('checkout/sessions', $url);
         }
 
-        \Stripe\ApiRequestor::setHttpClient(null);
+        ApiRequestor::setHttpClient(null);
     }
 
     public function test_downgrade_to_free_changes_plan_and_ranking(): void
