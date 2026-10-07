@@ -77,6 +77,41 @@ class BillingTest extends TestCase
         $this->assertEquals($this->free->id, $this->business->fresh()->plan_id);
     }
 
+    public function test_checkout_while_subscribed_changes_the_subscription_instead_of_opening_a_second_checkout(): void
+    {
+        config(['cashier.secret' => 'sk_test_x', 'services.stripe.prices.Featured' => 'price_featured']);
+        $this->owner->forceFill(['stripe_id' => 'cus_123'])->save();
+        $this->owner->subscriptions()->create([
+            'type' => 'default', 'stripe_id' => 'sub_123', 'stripe_status' => 'active',
+            'stripe_price' => 'price_premium', 'quantity' => 1,
+        ]);
+
+        // Records every Stripe call and fails it, so we see where the click went without the network.
+        $client = new class implements \Stripe\HttpClient\ClientInterface
+        {
+            public array $urls = [];
+
+            public function request($method, $absUrl, $headers, $params, $hasFile, $apiMode = 'v1', $maxNetworkRetries = null)
+            {
+                $this->urls[] = $absUrl;
+
+                return ['{"error":{"message":"stub"}}', 400, []];
+            }
+        };
+        \Stripe\ApiRequestor::setHttpClient($client);
+
+        Livewire::actingAs($this->owner)->test(Billing::class)
+            ->call('checkout', $this->featured->id)
+            ->assertHasErrors('billing');
+
+        $this->assertContains('https://api.stripe.com/v1/subscriptions/sub_123', $client->urls);
+        foreach ($client->urls as $url) {
+            $this->assertStringNotContainsString('checkout/sessions', $url);
+        }
+
+        \Stripe\ApiRequestor::setHttpClient(null);
+    }
+
     public function test_downgrade_to_free_changes_plan_and_ranking(): void
     {
         Business::create([

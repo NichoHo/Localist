@@ -1,4 +1,4 @@
-<x-public-layout :title="$business->name.' | '.$business->category->name.' in '.$business->city->name.' | Localist'" :description="Str::limit($business->description ?: $business->category->name.' in '.$business->city->name.', Indonesia.', 155)">
+<x-public-layout :title="$business->name.' | '.$business->category->name.' in '.$business->city->name.' | Localist'" :description="Str::limit($business->description ?: $business->category->name.' in '.$business->city->name.', Malaysia.', 155)">
     <x-json-ld :data="\App\Services\Seo::localBusiness($business)" />
     <x-json-ld :data="\App\Services\Seo::breadcrumbs([
         ['Home', route('home')],
@@ -109,7 +109,7 @@
                             <span @class(['status-pill', 'status-open' => $business->isOpenNow(), 'status-shut' => ! $business->isOpenNow()])>{{ $business->openStatusLabel() }}</span>
                         </div>
                         <dl class="mt-4 space-y-2.5 text-sm">
-                            @php $today = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'][now($business->city->timezone ?? 'Asia/Jakarta')->dayOfWeekIso - 1]; @endphp
+                            @php $today = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'][now($business->city->timezone ?? 'Asia/Kuala_Lumpur')->dayOfWeekIso - 1]; @endphp
                             @foreach ($business->hours as $day => $slot)
                                 <div @class(['flex items-center justify-between gap-4 rounded px-2 -mx-2', 'bg-canvas-2' => $day === $today])>
                                     <dt @class(['text-xs font-medium uppercase tracking-wide', 'text-ink' => $day === $today, 'text-ink-subtle' => $day !== $today])>{{ ucfirst($day) }}</dt>

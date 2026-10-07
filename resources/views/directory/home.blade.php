@@ -11,11 +11,11 @@
     <section class="mx-auto max-w-[76rem] px-4 pb-10 pt-14 sm:px-6 sm:pt-20">
         <div class="max-w-2xl">
             <h1 class="font-display text-4xl font-bold leading-[1.05] text-ink sm:text-5xl lg:text-6xl">Find what's <mark class="bg-accent px-1.5 text-on-accent">open</mark> right now.</h1>
-            <p class="mt-5 max-w-xl text-lg leading-relaxed text-ink-muted">{{ number_format($businessCount) }} restaurants, cafes, salons, clinics and more across {{ $cityCount }} Indonesian cities. Free to search, free to call.</p>
+            <p class="mt-5 max-w-xl text-lg leading-relaxed text-ink-muted">{{ number_format($businessCount) }} restaurants, cafes, salons, clinics and more across {{ $cityCount }} Malaysian cities. Free to search, free to call.</p>
 
             <form action="{{ route('search') }}" method="get" class="mt-8 flex max-w-xl flex-col overflow-hidden rounded border-2 border-ink bg-surface sm:flex-row">
                 <label for="hero-search" class="sr-only">What are you looking for?</label>
-                <input id="hero-search" type="search" name="q" placeholder="Nasi goreng near me, dentist open now, hotel in Bali"
+                <input id="hero-search" type="search" name="q" placeholder="Nasi lemak near me, dentist open now, hotel in Penang"
                     class="min-w-0 flex-1 border-0 bg-transparent px-4 py-3.5 text-base text-ink placeholder:text-ink-subtle focus:outline-none focus:ring-0">
                 <button type="submit" class="btn btn-accent rounded-none px-6 py-3.5 text-base sm:rounded-none">Search</button>
             </form>

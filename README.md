@@ -6,7 +6,7 @@ A directory platform for local businesses. Public programmatic directory (~5,700
 
 **Stack:** Laravel 12 · Livewire 3 + Alpine · Blade + Tailwind CSS 4 · MySQL · Stripe (Cashier) · Cloudflare
 
-> Seed data is real: ~5,700 Indonesian restaurants, cafes, salons, clinics and other local businesses, pulled from [Foursquare Open Source Places](https://opensource.foursquare.com/os-places/) (Apache 2.0). Real names, addresses and phone/website, no fabricated content, most listings unclaimed until an owner steps in. `database/seed/fetch_indonesia_listings.py` documents and regenerates the extraction (requires `pip install duckdb`).
+> Seed data is real: ~5,700 Malaysian restaurants, cafes, salons, clinics and other local businesses, pulled from [Foursquare Open Source Places](https://opensource.foursquare.com/os-places/) (Apache 2.0). Real names, addresses and phone/website, no fabricated content, most listings unclaimed until an owner steps in. `database/seed/fetch_malaysia_listings.py` documents and regenerates the extraction (requires `pip install duckdb`).
 
 ## Local setup
 

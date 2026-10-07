@@ -1,4 +1,4 @@
-@props(['title' => 'Localist | Find trusted local businesses', 'description' => 'Browse trusted local businesses across Indonesia.', 'noindex' => false])
+@props(['title' => 'Localist | Find trusted local businesses', 'description' => 'Browse trusted local businesses across Malaysia.', 'noindex' => false])
 
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
@@ -72,7 +72,7 @@
                     <div class="flex items-center gap-2.5">
                         <span class="font-display text-lg font-bold tracking-tight text-header-ink">Localist</span>
                     </div>
-                    <p class="mt-4 max-w-xs text-sm leading-relaxed text-header-ink/60">Find and compare local businesses across Indonesia. A portfolio project built on real, openly-licensed listing data; most listings are unclaimed until their owner steps in.</p>
+                    <p class="mt-4 max-w-xs text-sm leading-relaxed text-header-ink/60">Find and compare local businesses across Malaysia. A portfolio project built on real, openly-licensed listing data; most listings are unclaimed until their owner steps in.</p>
                 </div>
                 <div>
                     <p class="text-xs font-semibold uppercase tracking-[0.14em] text-header-ink/50">Popular categories</p>

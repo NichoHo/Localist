@@ -72,11 +72,11 @@ class Business extends Model
     private const DAY_KEYS = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'];
 
     // Stored hours are the business's own local wall-clock time; the app's clock
-    // (config/app.php) is UTC, and Indonesia spans three zones (WIB/WITA/WIT),
-    // so every comparison needs the business's city's own timezone, not a fixed one.
+    // (config/app.php) is UTC, and cities can differ in timezone,
+    // so every comparison uses the business's city's own timezone, not a fixed one.
     private function localNow(): Carbon
     {
-        return now($this->city->timezone ?? 'Asia/Jakarta');
+        return now($this->city->timezone ?? 'Asia/Kuala_Lumpur');
     }
 
     public function isOpenNow(): bool

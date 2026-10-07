@@ -1,4 +1,4 @@
-"""Builds database/seed/listings.csv from real Indonesian businesses.
+"""Builds database/seed/listings.csv from real Malaysian businesses.
 
 Source: Foursquare Open Source Places (Apache 2.0), 2025-02-06 release, mirrored
 publicly (no account/token needed) at https://source.coop/fused/fsq-os-places.
@@ -9,7 +9,7 @@ them in via the portal. That's the honest tradeoff of using real data.
 Requires: pip install duckdb
 
 Usage:
-    python database/seed/fetch_indonesia_listings.py
+    python database/seed/fetch_malaysia_listings.py
 """
 import csv
 import math
@@ -19,46 +19,48 @@ import time
 
 import duckdb
 
-RAW_PARQUET = "database/seed/raw/fsq_indonesia_local_business.parquet"
+RAW_PARQUET = "database/seed/raw/fsq_malaysia_local_business.parquet"
 OUT_CSV = "database/seed/listings.csv"
 
-# Curated cities: (name, region/province, timezone, lat, lng). Spans all three
-# Indonesian time zones (WIB/WITA/WIT) on purpose, since Business::isOpenNow()
-# needs a real per-city timezone, not one hardcoded clock.
+# Curated cities: (name, state, timezone, lat, lng). All of Malaysia (peninsula,
+# Sabah, Sarawak) is on Asia/Kuala_Lumpur (UTC+8), but the per-city timezone column
+# stays because Business::isOpenNow() reads it.
+TZ = "Asia/Kuala_Lumpur"
 CITIES = [
-    ("Jakarta", "DKI Jakarta", "Asia/Jakarta", -6.2088, 106.8456),
-    ("Surabaya", "Jawa Timur", "Asia/Jakarta", -7.2575, 112.7521),
-    ("Bandung", "Jawa Barat", "Asia/Jakarta", -6.9175, 107.6191),
-    ("Bekasi", "Jawa Barat", "Asia/Jakarta", -6.2383, 106.9756),
-    ("Depok", "Jawa Barat", "Asia/Jakarta", -6.4025, 106.7942),
-    ("Bogor", "Jawa Barat", "Asia/Jakarta", -6.5971, 106.8060),
-    ("Tangerang", "Banten", "Asia/Jakarta", -6.1783, 106.6319),
-    ("South Tangerang", "Banten", "Asia/Jakarta", -6.2884, 106.7180),
-    ("Semarang", "Jawa Tengah", "Asia/Jakarta", -6.9667, 110.4167),
-    ("Surakarta", "Jawa Tengah", "Asia/Jakarta", -7.5755, 110.8243),
-    ("Yogyakarta", "DI Yogyakarta", "Asia/Jakarta", -7.7956, 110.3695),
-    ("Malang", "Jawa Timur", "Asia/Jakarta", -7.9666, 112.6326),
-    ("Palembang", "Sumatera Selatan", "Asia/Jakarta", -2.9761, 104.7754),
-    ("Medan", "Sumatera Utara", "Asia/Jakarta", 3.5952, 98.6722),
-    ("Padang", "Sumatera Barat", "Asia/Jakarta", -0.9471, 100.4172),
-    ("Pekanbaru", "Riau", "Asia/Jakarta", 0.5333, 101.4500),
-    ("Batam", "Kepulauan Riau", "Asia/Jakarta", 1.0456, 104.0305),
-    ("Jambi", "Jambi", "Asia/Jakarta", -1.6101, 103.6131),
-    ("Bandar Lampung", "Lampung", "Asia/Jakarta", -5.4292, 105.2610),
-    ("Banda Aceh", "Aceh", "Asia/Jakarta", 5.5483, 95.3238),
-    ("Pontianak", "Kalimantan Barat", "Asia/Jakarta", -0.0263, 109.3425),
-    ("Denpasar", "Bali", "Asia/Makassar", -8.6705, 115.2126),
-    ("Makassar", "Sulawesi Selatan", "Asia/Makassar", -5.1477, 119.4327),
-    ("Balikpapan", "Kalimantan Timur", "Asia/Makassar", -1.2379, 116.8529),
-    ("Samarinda", "Kalimantan Timur", "Asia/Makassar", -0.5022, 117.1536),
-    ("Banjarmasin", "Kalimantan Selatan", "Asia/Makassar", -3.3186, 114.5944),
-    ("Manado", "Sulawesi Utara", "Asia/Makassar", 1.4748, 124.8421),
-    ("Mataram", "Nusa Tenggara Barat", "Asia/Makassar", -8.5833, 116.1167),
-    ("Jayapura", "Papua", "Asia/Jayapura", -2.5337, 140.7181),
-    ("Ambon", "Maluku", "Asia/Jayapura", -3.6954, 128.1814),
-    ("Sorong", "Papua Barat Daya", "Asia/Jayapura", -0.8762, 131.2558),
+    ("Kuala Lumpur", "Kuala Lumpur", TZ, 3.1390, 101.6869),
+    ("Petaling Jaya", "Selangor", TZ, 3.1073, 101.6067),
+    ("Shah Alam", "Selangor", TZ, 3.0738, 101.5183),
+    ("Subang Jaya", "Selangor", TZ, 3.0565, 101.5851),
+    ("Klang", "Selangor", TZ, 3.0449, 101.4456),
+    ("Puchong", "Selangor", TZ, 3.0206, 101.6177),
+    ("Kajang", "Selangor", TZ, 2.9927, 101.7909),
+    ("Putrajaya", "Putrajaya", TZ, 2.9264, 101.6964),
+    ("Cyberjaya", "Selangor", TZ, 2.9213, 101.6559),
+    ("Seremban", "Negeri Sembilan", TZ, 2.7258, 101.9424),
+    ("George Town", "Penang", TZ, 5.4141, 100.3288),
+    ("Butterworth", "Penang", TZ, 5.3992, 100.3639),
+    ("Ipoh", "Perak", TZ, 4.5975, 101.0901),
+    ("Taiping", "Perak", TZ, 4.8500, 100.7333),
+    ("Sungai Petani", "Kedah", TZ, 5.6470, 100.4877),
+    ("Alor Setar", "Kedah", TZ, 6.1248, 100.3678),
+    ("Johor Bahru", "Johor", TZ, 1.4927, 103.7414),
+    ("Iskandar Puteri", "Johor", TZ, 1.4355, 103.6435),
+    ("Batu Pahat", "Johor", TZ, 1.8548, 102.9325),
+    ("Muar", "Johor", TZ, 2.0442, 102.5689),
+    ("Melaka", "Melaka", TZ, 2.1896, 102.2501),
+    ("Kuantan", "Pahang", TZ, 3.8077, 103.3260),
+    ("Kota Bharu", "Kelantan", TZ, 6.1254, 102.2381),
+    ("Kuala Terengganu", "Terengganu", TZ, 5.3302, 103.1408),
+    ("Kangar", "Perlis", TZ, 6.4414, 100.1986),
+    ("Kota Kinabalu", "Sabah", TZ, 5.9804, 116.0735),
+    ("Sandakan", "Sabah", TZ, 5.8394, 118.1172),
+    ("Tawau", "Sabah", TZ, 4.2498, 117.8871),
+    ("Kuching", "Sarawak", TZ, 1.5535, 110.3593),
+    ("Miri", "Sarawak", TZ, 4.3995, 113.9914),
+    ("Sibu", "Sarawak", TZ, 2.2870, 111.8300),
+    ("Bintulu", "Sarawak", TZ, 3.1700, 113.0360),
 ]
-CITY_RADIUS_KM = 25  # rows farther than this from every curated city are dropped
+CITY_RADIUS_KM = 15  # rows farther than this from every curated city are dropped
 
 # (slug, display name, keywords) in match priority order: narrower categories
 # first so a multi-label row (e.g. a hotel's own restaurant) lands in the

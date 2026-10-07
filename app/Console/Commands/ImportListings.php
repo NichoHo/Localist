@@ -45,7 +45,7 @@ class ImportListings extends Command
                 [
                     'name' => $data['city'], 'region' => $data['region'] ?? null,
                     'lat' => $data['lat'] ?? null, 'lng' => $data['lng'] ?? null,
-                    'timezone' => $data['timezone'] ?? 'Asia/Jakarta',
+                    'timezone' => $data['timezone'] ?? 'Asia/Kuala_Lumpur',
                 ]
             )->id;
 
