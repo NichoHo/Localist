@@ -6,10 +6,8 @@
         @if ($loop->last || ! $url)
             <span class="font-medium text-ink" aria-current="page">{{ $label }}</span>
         @else
-            <a href="{{ $url }}" class="transition hover:text-brand">{{ $label }}</a>
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="size-3.5 shrink-0 text-ink-subtle" aria-hidden="true">
-                <path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" />
-            </svg>
+            <a href="{{ $url }}" class="transition-colors hover:text-ink">{{ $label }}</a>
+            <x-icon name="chevron-right" class="size-3.5 shrink-0 text-ink-subtle" />
         @endif
     @endforeach
 </nav>

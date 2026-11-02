@@ -1,108 +1,70 @@
-<nav x-data="{ 
-         open: false, 
-         atTop: true, 
-         show: true, 
-         lastY: 0,
-         handleScroll() {
-             let y = window.scrollY;
-             this.atTop = y <= 0;
-             if (y > this.lastY && y > 50 && !this.open) {
-                 this.show = false;
-             } else if (y < this.lastY) {
-                 this.show = true;
-             }
-             this.lastY = y;
-         }
-     }"
-     @scroll.window="handleScroll()"
-     class="header-bar trade-band transition-transform duration-300"
-     :class="{ '-translate-y-full': !show, 'translate-y-0': show, 'shadow-md': !atTop }">
-    <div class="mx-auto max-w-[76rem] px-4 sm:px-6">
-        <div class="flex h-16 justify-between">
-            <div class="flex">
-                <!-- Logo -->
-                <div class="flex shrink-0 items-center">
-                    <a href="{{ route('dashboard') }}" class="font-display text-lg font-bold tracking-tight text-header-ink">Localist</a>
-                </div>
+@php
+    $user = auth()->user();
+    $unread = $user->business()?->leads()->whereNull('read_at')->count() ?? 0;
+    $items = [
+        ['Dashboard', route('dashboard'), 'dashboard', request()->routeIs('dashboard'), 0],
+        ['Edit listing', route('portal.edit'), 'pencil', request()->routeIs('portal.edit', 'portal.photos'), 0],
+        ['Leads', route('portal.leads'), 'inbox', request()->routeIs('portal.leads'), $unread],
+        ['Billing', route('portal.billing'), 'card', request()->routeIs('portal.billing'), 0],
+    ];
+    if ($user->role === 'admin') {
+        $items[] = ['Admin', route('admin'), 'shield', request()->routeIs('admin'), 0];
+    }
+    $initials = collect(explode(' ', $user->name))->take(2)->map(fn ($w) => mb_substr($w, 0, 1))->implode('');
+@endphp
 
-                <!-- Navigation Links -->
-                <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-                    <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">{{ __('Dashboard') }}</x-nav-link>
-                    <x-nav-link :href="route('portal.edit')" :active="request()->routeIs('portal.edit')">{{ __('Edit listing') }}</x-nav-link>
-                    <x-nav-link :href="route('portal.photos')" :active="request()->routeIs('portal.photos')">{{ __('Photos') }}</x-nav-link>
-                    <x-nav-link :href="route('portal.leads')" :active="request()->routeIs('portal.leads')">{{ __('Leads') }}</x-nav-link>
-                    <x-nav-link :href="route('portal.billing')" :active="request()->routeIs('portal.billing')">{{ __('Billing') }}</x-nav-link>
-                    @if (auth()->user()->role === 'admin')
-                        <x-nav-link :href="route('admin')" :active="request()->routeIs('admin')">{{ __('Admin') }}</x-nav-link>
+{{-- Desktop: top bar with pill links. Mobile: a slim top bar plus a bottom tab bar. --}}
+<header class="sticky top-0 z-40 border-b border-line bg-canvas/90 backdrop-blur">
+    <div class="mx-auto flex h-16 max-w-[76rem] items-center gap-6 px-4 sm:px-6">
+        <a href="{{ route('dashboard') }}" class="font-display text-xl font-bold tracking-tight text-ink lg:text-2xl">Localist</a>
+
+        <nav class="hidden items-center gap-1 lg:ml-4 lg:flex" aria-label="Portal">
+            @foreach ($items as [$label, $href, $icon, $active, $badge])
+                <x-nav-link :href="$href" :active="$active">
+                    {{ __($label) }}
+                    @if ($badge > 0)
+                        <span class="ml-2 rounded-full bg-accent px-1.5 text-xs font-semibold tabular-nums text-on-accent">{{ $badge }}</span>
                     @endif
-                </div>
-            </div>
+                </x-nav-link>
+            @endforeach
+        </nav>
 
-            <!-- Settings Dropdown -->
-            <div class="hidden sm:ms-6 sm:flex sm:items-center">
-                <x-dropdown align="right" width="48">
-                    <x-slot name="trigger">
-                        <button class="inline-flex items-center gap-1.5 rounded px-3 py-2 text-sm font-medium text-header-ink/75 transition hover:bg-white/10 hover:text-header-ink focus:outline-none">
-                            <div>{{ Auth::user()->name }}</div>
-                            <svg class="size-4 fill-current" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
-                            </svg>
-                        </button>
-                    </x-slot>
+        <div class="ml-auto flex items-center gap-2">
+            <a href="{{ route('home') }}" class="hidden rounded-full px-3 py-2 text-sm font-medium text-ink-muted transition-colors hover:text-ink sm:inline-flex">View directory</a>
+            <x-dropdown align="right" width="48">
+                <x-slot name="trigger">
+                    <button class="inline-flex items-center gap-2 rounded-full border border-line bg-surface py-1 pl-1 pr-3 text-sm font-medium text-ink transition-colors hover:border-line-strong focus:outline-none" aria-label="Account menu">
+                        <span class="grid size-8 place-items-center rounded-full bg-accent text-xs font-bold uppercase text-on-accent">{{ $initials }}</span>
+                        <span class="hidden sm:inline">{{ $user->name }}</span>
+                        <x-icon name="chevron-down" class="size-3.5 text-ink-subtle" />
+                    </button>
+                </x-slot>
 
-                    <x-slot name="content">
-                        <x-dropdown-link :href="route('profile.edit')">{{ __('Profile') }}</x-dropdown-link>
-                        <form method="POST" action="{{ route('logout') }}">
-                            @csrf
-                            <x-dropdown-link :href="route('logout')" onclick="event.preventDefault(); this.closest('form').submit();">
-                                {{ __('Log Out') }}
-                            </x-dropdown-link>
-                        </form>
-                    </x-slot>
-                </x-dropdown>
-            </div>
-
-            <!-- Hamburger -->
-            <div class="-me-2 flex items-center sm:hidden">
-                <button @click="open = ! open" class="inline-flex items-center justify-center rounded p-2 text-header-ink/60 transition hover:bg-white/10 hover:text-header-ink focus:outline-none">
-                    <svg class="size-6" stroke="currentColor" fill="none" viewBox="0 0 24 24">
-                        <path :class="{'hidden': open, 'inline-flex': ! open }" class="inline-flex" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
-                        <path :class="{'hidden': ! open, 'inline-flex': open }" class="hidden" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                </button>
-            </div>
+                <x-slot name="content">
+                    <x-dropdown-link :href="route('profile.edit')">{{ __('Profile') }}</x-dropdown-link>
+                    <x-dropdown-link :href="route('home')">{{ __('View directory') }}</x-dropdown-link>
+                    <form method="POST" action="{{ route('logout') }}">
+                        @csrf
+                        <x-dropdown-link :href="route('logout')" onclick="event.preventDefault(); this.closest('form').submit();">
+                            {{ __('Log Out') }}
+                        </x-dropdown-link>
+                    </form>
+                </x-slot>
+            </x-dropdown>
         </div>
     </div>
+</header>
 
-    <!-- Responsive Navigation Menu -->
-    <div :class="{'block': open, 'hidden': ! open}" class="hidden border-t border-header-line sm:hidden">
-        <div class="space-y-1 py-3">
-            <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">{{ __('Dashboard') }}</x-responsive-nav-link>
-            <x-responsive-nav-link :href="route('portal.edit')" :active="request()->routeIs('portal.edit')">{{ __('Edit listing') }}</x-responsive-nav-link>
-            <x-responsive-nav-link :href="route('portal.photos')" :active="request()->routeIs('portal.photos')">{{ __('Photos') }}</x-responsive-nav-link>
-            <x-responsive-nav-link :href="route('portal.leads')" :active="request()->routeIs('portal.leads')">{{ __('Leads') }}</x-responsive-nav-link>
-            <x-responsive-nav-link :href="route('portal.billing')" :active="request()->routeIs('portal.billing')">{{ __('Billing') }}</x-responsive-nav-link>
-            @if (auth()->user()->role === 'admin')
-                <x-responsive-nav-link :href="route('admin')" :active="request()->routeIs('admin')">{{ __('Admin') }}</x-responsive-nav-link>
-            @endif
-        </div>
-
-        <!-- Responsive Settings Options -->
-        <div class="border-t border-header-line py-4">
-            <div class="px-4">
-                <div class="text-base font-medium text-header-ink">{{ Auth::user()->name }}</div>
-                <div class="text-sm font-medium text-header-ink/60">{{ Auth::user()->email }}</div>
-            </div>
-
-            <div class="mt-3 space-y-1">
-                <x-responsive-nav-link :href="route('profile.edit')">{{ __('Profile') }}</x-responsive-nav-link>
-                <form method="POST" action="{{ route('logout') }}">
-                    @csrf
-                    <x-responsive-nav-link :href="route('logout')" onclick="event.preventDefault(); this.closest('form').submit();">
-                        {{ __('Log Out') }}
-                    </x-responsive-nav-link>
-                </form>
-            </div>
-        </div>
-    </div>
+<nav class="tabbar" style="grid-template-columns: repeat({{ count($items) }}, minmax(0, 1fr))" aria-label="Portal">
+    @foreach ($items as [$label, $href, $icon, $active, $badge])
+        <a href="{{ $href }}" class="tabbar-item" @if ($active) aria-current="page" @endif>
+            <span class="tabbar-icon">
+                <x-icon :name="$icon" class="size-5" />
+                @if ($badge > 0)
+                    <span class="absolute right-[22%] top-0 grid min-w-4 place-items-center rounded-full bg-ink px-1 text-[10px] font-bold leading-4 tabular-nums text-canvas">{{ $badge }}</span>
+                @endif
+            </span>
+            {{ __($label) }}
+        </a>
+    @endforeach
 </nav>

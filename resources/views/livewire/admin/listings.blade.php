@@ -1,5 +1,5 @@
-<div class="mx-auto max-w-6xl px-4 py-10 sm:px-6 sm:py-12">
-    <h1 class="font-display text-2xl font-bold text-ink sm:text-3xl">Admin listings</h1>
+<div class="mx-auto max-w-6xl px-4 py-6 sm:px-6 lg:py-12">
+    <h1 class="font-display text-2xl font-bold tracking-tight text-ink sm:text-3xl">Admin listings</h1>
 
     <div class="mt-6 flex flex-wrap items-center gap-2">
         @foreach (['pending', 'published', 'draft', 'all'] as $tab)

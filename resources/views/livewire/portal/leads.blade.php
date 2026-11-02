@@ -1,8 +1,8 @@
-<div class="mx-auto max-w-3xl px-4 py-10 sm:px-6 sm:py-12">
+<div class="mx-auto max-w-3xl px-4 py-6 sm:px-6 lg:py-12">
     <div class="flex items-center gap-3">
-        <h1 class="font-display text-2xl font-bold text-ink sm:text-3xl">Leads</h1>
+        <h1 class="font-display text-2xl font-bold tracking-tight text-ink sm:text-3xl">Leads</h1>
         @if ($unread > 0)
-            <span class="rounded-full bg-brand px-2.5 py-0.5 text-sm font-semibold tabular-nums text-on-brand">{{ $unread }} unread</span>
+            <span class="rounded-full bg-accent px-2.5 py-0.5 text-sm font-semibold tabular-nums text-on-accent">{{ $unread }} unread</span>
         @endif
     </div>
 
@@ -18,7 +18,7 @@
     @else
         <ul class="surface-card mt-6 divide-y divide-line overflow-hidden">
             @foreach ($leads as $lead)
-                <li wire:key="lead-{{ $lead->id }}" class="p-4 sm:p-5 {{ $lead->read_at ? '' : 'bg-brand-soft' }}">
+                <li wire:key="lead-{{ $lead->id }}" class="p-4 sm:p-5 {{ $lead->read_at ? '' : 'bg-accent-soft/50' }}">
                     <div class="flex items-start justify-between gap-4">
                         <div class="min-w-0">
                             <p class="font-semibold text-ink">
@@ -35,7 +35,7 @@
                             <p class="mt-2 text-sm text-ink">{{ $lead->message }}</p>
                         </div>
                         <button wire:click="toggleRead({{ $lead->id }})"
-                            class="shrink-0 rounded-lg border border-line px-2.5 py-1 text-xs font-medium text-ink-muted transition hover:border-brand-line hover:bg-brand-soft hover:text-brand">
+                            class="shrink-0 rounded-full border border-line-strong px-3 py-1.5 text-xs font-medium text-ink-muted transition-colors hover:bg-canvas-2 hover:text-ink">
                             {{ $lead->read_at ? 'Mark unread' : 'Mark read' }}
                         </button>
                     </div>

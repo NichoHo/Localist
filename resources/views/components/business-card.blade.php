@@ -1,57 +1,61 @@
 @props(['business', 'hideCategory' => false])
 
-{{-- A row, not a card: a trade icon anchors identity on the left, a compact
-     icon action sits on the right. Status sits inline with category/city,
-     where a reader is already looking for it. Featured rows get a solid
-     accent icon swatch instead of a neutral one — this is the paid tier, it
-     should visibly earn that on the one element that's already meant to
-     stand out (the accent color is reserved for exactly this elsewhere in
-     the system), not just say so in a small tag. --}}
-{{-- Rows separate via the parent `.business-list`'s `divide-y`, not a
-     self-drawn border, so the last row in a list never dangles an extra
-     rule beneath it. --}}
-<div class="grid grid-cols-[1fr_auto] items-center gap-x-4 gap-y-1 px-4 py-5 transition hover:bg-canvas-2">
-    <a href="{{ route('business', $business) }}" class="group flex min-w-0 items-center gap-3.5">
-        <span @class([
-            'grid size-10 shrink-0 place-items-center rounded-md ring-1 ring-inset transition duration-150',
-            'bg-accent text-on-accent ring-accent-line' => $business->isFeatured(),
-            'bg-brand-soft text-brand ring-brand-line group-hover:bg-brand group-hover:text-on-brand group-hover:ring-brand' => ! $business->isFeatured(),
-        ])>
-            <x-category-icon :slug="$business->category->slug" class="size-5" />
-        </span>
+{{-- One markup, two layouts (see .business-list in app.css).
+     Below lg: a list row. An icon tile, the name, a meta line and the open status,
+     with a round call button on the right.
+     lg and up: a card. The icon tile and featured label across the top, the name and
+     meta under them, then a footer with the status and a Call button.
+     Featured listings carry only a quiet label; the list order (featured first) does
+     the work. Rows separate through the parent's divide-y. --}}
+@php
+    $label = $business->openStatusLabel();
+    $open = $business->isOpenNow();
+@endphp
+<div class="biz">
+    <a href="{{ route('business', $business) }}" class="group flex min-w-0 flex-1 items-center gap-3.5 lg:flex-none lg:flex-col lg:items-stretch lg:gap-4">
+        <div class="flex items-start justify-between gap-3">
+            <span class="icon-tile size-12 lg:size-11"><x-category-icon :slug="$business->category->slug" class="size-5" /></span>
+            @if ($business->isFeatured())
+                <span class="featured-tag hidden lg:inline-flex">Featured</span>
+            @endif
+        </div>
 
-        <div class="min-w-0">
-            <div class="flex flex-wrap items-center gap-x-2 gap-y-1">
-                <h3 class="truncate text-base font-bold text-ink group-hover:underline">{{ $business->name }}</h3>
+        <div class="min-w-0 flex-1 lg:flex-none">
+            <div class="flex items-center gap-2">
+                <h3 class="truncate text-base font-semibold leading-snug text-ink lg:whitespace-normal lg:text-lg">{{ $business->name }}</h3>
                 @if ($business->isFeatured())
-                    <span class="featured-tag">Featured</span>
+                    <span class="featured-tag shrink-0 lg:hidden">Featured</span>
                 @endif
             </div>
-            <p class="mt-0.5 flex flex-wrap items-center gap-x-2 gap-y-0.5 text-sm text-ink-muted">
-                <span class="min-w-0 truncate">
-                    @unless ($hideCategory)
-                        {{ $business->category->name }} &middot;
-                    @endunless
-                    {{ $business->city->name }}
-                </span>
-                @if ($label = $business->openStatusLabel())
-                    <span @class(['status-pill shrink-0', 'status-open' => $business->isOpenNow(), 'status-shut' => ! $business->isOpenNow()])>{{ $label }}</span>
-                @endif
+            <p class="mt-0.5 truncate text-sm text-ink-muted lg:whitespace-normal">
+                @unless ($hideCategory)
+                    {{ $business->category->name }} &middot;
+                @endunless
+                {{ $business->city->name }}
             </p>
+            @if ($label)
+                <span @class(['status-pill mt-1 lg:hidden', 'status-open' => $open, 'status-shut' => ! $open])>{{ $label }}</span>
+            @endif
         </div>
     </a>
 
-    @if ($business->phone)
-        <a href="tel:{{ $business->phone }}" aria-label="Call {{ $business->name }}" class="row-action row-action-call">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="size-4.5" aria-hidden="true">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 6.75c0 8.28 6.72 15 15 15h2.25a2.25 2.25 0 0 0 2.25-2.25v-1.37c0-.52-.35-.97-.85-1.09l-4.42-1.11c-.44-.11-.9.06-1.17.42l-.97 1.29c-.28.38-.77.54-1.21.38a12.04 12.04 0 0 1-7.14-7.14c-.16-.44 0-.93.38-1.21l1.29-.97c.36-.27.53-.73.42-1.17L6.96 3.1a1.13 1.13 0 0 0-1.09-.85H4.5A2.25 2.25 0 0 0 2.25 4.5z" />
-            </svg>
-        </a>
-    @else
-        <a href="{{ route('business', $business) }}" aria-label="View {{ $business->name }}" class="row-action row-action-view">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="size-4.5" aria-hidden="true">
-                <path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" />
-            </svg>
-        </a>
-    @endif
+    <div class="flex shrink-0 items-center lg:justify-between lg:gap-3 lg:border-t lg:border-line lg:pt-4">
+        @if ($label)
+            <span @class(['status-pill hidden lg:inline-flex', 'status-open' => $open, 'status-shut' => ! $open])>{{ $label }}</span>
+        @else
+            <span class="hidden lg:block"></span>
+        @endif
+
+        @if ($business->phone)
+            <a href="tel:{{ $business->phone }}" aria-label="Call {{ $business->name }}" class="row-action row-action-call lg:size-auto lg:h-10 lg:gap-2 lg:px-4">
+                <x-icon name="phone" class="size-[18px]" />
+                <span class="hidden text-sm font-semibold lg:inline">Call</span>
+            </a>
+        @else
+            <a href="{{ route('business', $business) }}" aria-label="View {{ $business->name }}" class="row-action row-action-view lg:size-auto lg:h-10 lg:gap-2 lg:px-4">
+                <x-icon name="chevron-right" class="size-[18px]" />
+                <span class="hidden text-sm font-semibold lg:inline">View</span>
+            </a>
+        @endif
+    </div>
 </div>

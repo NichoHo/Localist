@@ -6,110 +6,123 @@
         $openCount = cache()->remember('home.open_now_count', 300, fn () => \App\Models\Business::published()->with('city:id,timezone')->get(['id', 'city_id', 'hours'])->filter->isOpenNow()->count());
     @endphp
 
-    {{-- Hero: search is the CTA. No stock photo, no gradient — the headline
-         and the findbar carry the section on their own. --}}
-    <section class="mx-auto max-w-[76rem] px-4 pb-10 pt-14 sm:px-6 sm:pt-20">
-        <div class="max-w-2xl">
-            <h1 class="font-display text-4xl font-bold leading-[1.05] text-ink sm:text-5xl lg:text-6xl">Find what's <mark class="bg-accent px-1.5 text-on-accent">open</mark> right now.</h1>
-            <p class="mt-5 max-w-xl text-lg leading-relaxed text-ink-muted">{{ number_format($businessCount) }} restaurants, cafes, salons, clinics and more across {{ $cityCount }} Malaysian cities. Free to search, free to call.</p>
+    {{-- Hero. Desktop: headline and search on the left, a live "open right now" panel on the right.
+         Mobile: headline, a big search field and a scrolling row of categories. --}}
+    <section class="mx-auto grid max-w-[76rem] items-center gap-10 px-4 pb-8 pt-8 sm:px-6 lg:grid-cols-[1.15fr_1fr] lg:gap-14 lg:pb-14 lg:pt-16">
+        <div class="min-w-0">
+            <span class="inline-flex items-center gap-2 rounded-full border border-line bg-surface px-3 py-1 text-[13px] font-medium text-ink-muted">
+                @if ($openCount > 0)
+                    <span class="size-2 rounded-full bg-success"></span>{{ number_format($openCount) }} places open right now
+                @else
+                    <span class="size-2 rounded-full bg-ink-subtle"></span>{{ number_format($businessCount) }} places listed
+                @endif
+            </span>
+            <h1 class="mt-5 font-display text-[2.5rem] font-bold leading-[1.02] tracking-[-0.035em] text-ink sm:text-6xl lg:text-[4.5rem]">Find what's <mark class="rounded-xl bg-accent px-2 text-on-accent">open</mark> near you, right now.</h1>
+            <p class="mt-5 max-w-lg text-base leading-relaxed text-ink-muted sm:text-lg">{{ number_format($businessCount) }} restaurants, cafes, salons, clinics and more across {{ $cityCount }} Malaysian cities. Free to search, free to call.</p>
 
-            <form action="{{ route('search') }}" method="get" class="mt-8 flex max-w-xl flex-col overflow-hidden rounded border-2 border-ink bg-surface sm:flex-row">
+            <form action="{{ route('search') }}" method="get" class="mt-7 flex max-w-xl items-center gap-2 rounded-2xl border border-line-strong bg-surface p-1.5 transition-colors focus-within:border-ink sm:mt-8 lg:rounded-full">
                 <label for="hero-search" class="sr-only">What are you looking for?</label>
-                <input id="hero-search" type="search" name="q" placeholder="Nasi lemak near me, dentist open now, hotel in Penang"
-                    class="min-w-0 flex-1 border-0 bg-transparent px-4 py-3.5 text-base text-ink placeholder:text-ink-subtle focus:outline-none focus:ring-0">
-                <button type="submit" class="btn btn-accent rounded-none px-6 py-3.5 text-base sm:rounded-none">Search</button>
+                <x-icon name="search" class="ml-3 size-5 shrink-0 text-ink-subtle" />
+                <input id="hero-search" type="search" name="q" placeholder="Nasi lemak, dentist, hotel in Penang"
+                    class="min-w-0 flex-1 border-0 bg-transparent px-1 py-3 text-base text-ink placeholder:text-ink-subtle focus:outline-none focus:ring-0 lg:py-2.5">
+                <button type="submit" class="btn btn-primary shrink-0 px-6 py-3 lg:py-2.5">Search</button>
             </form>
 
-            <div class="mt-5 flex flex-wrap items-center gap-2">
-                <span class="text-sm text-ink-subtle">Try:</span>
+            <div class="-mx-4 mt-5 flex gap-2 overflow-x-auto px-4 pb-1 [scrollbar-width:none] sm:mx-0 sm:px-0 lg:flex-wrap [&::-webkit-scrollbar]:hidden">
                 @foreach ($categories->take(6) as $category)
-                    <a href="{{ route('category', $category) }}" class="rounded border border-line-strong px-3 py-1.5 text-sm font-medium text-ink transition hover:bg-canvas-2">{{ $category->name }}</a>
+                    <a href="{{ route('category', $category) }}" class="chip shrink-0">
+                        <x-category-icon :slug="$category->slug" class="size-4" />
+                        {{ $category->name }}
+                    </a>
                 @endforeach
             </div>
         </div>
+
+        @if ($openNow->isNotEmpty())
+            <div class="surface-card hidden overflow-hidden lg:block">
+                <div class="flex items-start justify-between gap-4 px-6 pb-3 pt-6">
+                    <div>
+                        <h2 class="font-display text-lg font-bold text-ink">Open right now</h2>
+                        <p class="mt-0.5 text-sm text-ink-muted">Featured listings first</p>
+                    </div>
+                    <span class="inline-flex items-center gap-1.5 text-xs font-medium text-success-text"><span class="size-1.5 animate-pulse rounded-full bg-success"></span>Live</span>
+                </div>
+                <ul>
+                    @foreach ($openNow as $business)
+                        <li class="border-t border-line">
+                            <a href="{{ route('business', $business) }}" class="flex items-center gap-3 px-6 py-3.5 transition-colors hover:bg-canvas-2">
+                                <span class="icon-tile size-10"><x-category-icon :slug="$business->category->slug" class="size-[1.15rem]" /></span>
+                                <span class="min-w-0 flex-1">
+                                    <span class="block truncate font-medium text-ink">{{ $business->name }}</span>
+                                    <span class="block truncate text-sm text-ink-muted">{{ $business->category->name }} &middot; {{ $business->city->name }}</span>
+                                </span>
+                                @if ($business->isFeatured())
+                                    <span class="featured-tag shrink-0">Featured</span>
+                                @endif
+                            </a>
+                        </li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
     </section>
 
-    {{-- Stat readout: tabular figures, the fact that matters ("open right
-         now") given equal weight to the vanity numbers next to it. --}}
-    <section class="border-y border-line bg-canvas">
-        <div class="mx-auto max-w-[76rem] px-4 sm:px-6">
-            <div class="grid grid-cols-2 divide-x divide-y divide-line sm:grid-cols-4 sm:divide-y-0">
-                @foreach ([
-                    [number_format($businessCount), 'Listings'],
-                    [$cityCount, 'Cities'],
-                    [$categories->count(), 'Categories'],
-                    [number_format($openCount), 'Open right now'],
-                ] as [$value, $label])
-                    <div class="px-4 py-6 first:pl-0 sm:px-6">
-                        <p class="font-mono text-2xl font-bold tabular-nums text-ink sm:text-3xl">{{ $value }}</p>
-                        <p class="mt-1 text-sm text-ink-muted">{{ $label }}</p>
-                    </div>
+    {{-- Featured businesses come straight after the hero, together, never scattered through other lists --}}
+    @if ($featured->isNotEmpty())
+        <section class="mx-auto max-w-[76rem] px-4 py-8 sm:px-6 lg:py-12">
+            <div class="mb-5 lg:mb-6">
+                <h2 class="font-display text-2xl font-bold tracking-tight text-ink lg:text-3xl">Featured businesses</h2>
+                <p class="mt-1 text-ink-muted">Paid placement, shown first.</p>
+            </div>
+            <div class="business-list">
+                @foreach ($featured as $business)
+                    <x-business-card :business="$business" />
                 @endforeach
             </div>
-        </div>
-    </section>
+        </section>
+    @endif
 
     {{-- Browse by category --}}
-    <section class="mx-auto max-w-[76rem] px-4 py-16 sm:px-6 sm:py-20">
-        <h2 class="font-display text-2xl font-bold text-ink sm:text-3xl">Browse by category</h2>
-        <div class="mt-8 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+    <section class="mx-auto max-w-[76rem] px-4 py-8 sm:px-6 lg:py-12">
+        <h2 class="font-display text-2xl font-bold tracking-tight text-ink lg:text-3xl">Browse by category</h2>
+        <div class="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:mt-6 lg:grid-cols-3 lg:gap-4">
             @foreach ($categories as $category)
                 <x-category-tile :category="$category" :href="route('category', $category)" :meta="number_format($category->businesses_count).' listings'" />
             @endforeach
         </div>
     </section>
 
-    {{-- Featured businesses — a dense row list, not a padded card grid --}}
-    @if ($featured->isNotEmpty())
-        <section class="border-y border-line bg-canvas-2">
-            <div class="mx-auto max-w-[76rem] px-4 py-16 sm:px-6 sm:py-20">
-                <div class="flex items-center justify-between gap-4">
-                    <h2 class="font-display text-2xl font-bold text-ink sm:text-3xl">Featured businesses</h2>
-                    <span class="featured-flag hidden sm:inline-flex">Paid placement</span>
-                </div>
-                <div class="business-list mt-6">
-                    @foreach ($featured as $business)
-                        <x-business-card :business="$business" />
-                    @endforeach
-                </div>
-            </div>
-        </section>
-    @endif
-
     {{-- Popular cities --}}
-    <section class="mx-auto max-w-[76rem] px-4 py-16 sm:px-6 sm:py-20">
-        <h2 class="font-display text-2xl font-bold text-ink sm:text-3xl">Popular cities</h2>
-        <div class="mt-8 flex flex-wrap gap-2.5">
+    <section class="mx-auto max-w-[76rem] px-4 py-8 sm:px-6 lg:py-12">
+        <h2 class="font-display text-2xl font-bold tracking-tight text-ink lg:text-3xl">Browse by city</h2>
+        <div class="mt-5 grid grid-cols-1 gap-x-10 sm:grid-cols-2 lg:mt-6 lg:grid-cols-3">
             @foreach ($cities as $city)
-                <a href="{{ route('city', $city) }}" class="chip">
-                    {{ $city->name }}
-                    <span class="text-ink-subtle">{{ number_format($city->businesses_count) }}</span>
+                <a href="{{ route('city', $city) }}" class="flex items-center justify-between border-t border-line py-3.5 text-ink transition-colors hover:text-ink-muted">
+                    <span class="font-medium">{{ $city->name }}</span>
+                    <span class="text-sm tabular-nums text-ink-muted">{{ number_format($city->businesses_count) }}</span>
                 </a>
             @endforeach
         </div>
     </section>
 
-    {{-- CTA: for businesses. Solid yellow, the one other place on the page
-         it appears besides Featured flags — reserved for exactly this. A
-         real photo earns the other half of the panel instead of leaving it
-         a flat color block; desaturated so it sits inside the ink/paper
-         palette instead of fighting it with its own colors. --}}
-    {{-- Photo: Inna Safa via Unsplash, free license, no attribution required. --}}
-    <section class="mx-auto max-w-[76rem] px-4 sm:px-6">
-        <div class="grid overflow-hidden rounded-md bg-accent sm:grid-cols-2">
-            <div class="flex flex-col justify-center px-6 py-14 text-center sm:order-2 sm:px-12 sm:py-16 sm:text-left">
-                <h2 class="font-display text-2xl font-bold text-on-accent sm:text-3xl">Own a local business? Get found by customers.</h2>
-                <p class="mt-4 text-on-accent/75">Claim your free listing, manage it in minutes and reach people searching for exactly what you offer.</p>
-                <div class="mt-8 flex flex-wrap justify-center gap-3 sm:justify-start">
-                    <a href="{{ route('register') }}" class="btn btn-on-accent px-6 py-3 text-base font-bold uppercase tracking-wide focus-visible:ring-offset-accent">List your business</a>
-                    <a href="{{ route('login') }}" class="btn btn-on-accent-ghost px-6 py-3 text-base font-bold uppercase tracking-wide focus-visible:ring-offset-accent">Owner login</a>
+    {{-- CTA for businesses --}}
+    <section class="mx-auto max-w-[76rem] px-4 pt-6 sm:px-6 lg:pt-10">
+        <div class="grid gap-8 rounded-3xl bg-accent p-7 sm:p-10 lg:grid-cols-[1.2fr_1fr] lg:items-center lg:p-12">
+            <div>
+                <h2 class="font-display text-3xl font-bold leading-[1.05] tracking-tight text-on-accent sm:text-4xl">Own a local business? Get found by customers.</h2>
+                <p class="mt-4 max-w-md text-on-accent/75">Claim your free listing, keep your hours right and answer enquiries from one dashboard.</p>
+                <div class="mt-7 flex flex-wrap gap-3">
+                    <a href="{{ route('register') }}" class="btn btn-on-accent btn-lg focus-visible:ring-offset-accent">List your business</a>
+                    <a href="{{ route('login') }}" class="btn btn-on-accent-ghost btn-lg focus-visible:ring-offset-accent">Owner login</a>
                 </div>
             </div>
-            <div class="min-h-56 sm:order-1">
-                <img src="https://images.unsplash.com/photo-1708493449820-d8f0507bc29e?fm=jpg&amp;q=80&amp;w=1200&amp;h=800&amp;fit=crop&amp;auto=format"
-                    alt="A woman preparing food at her small kitchen counter for a customer"
-                    width="1200" height="800" loading="lazy"
-                    class="h-full w-full object-cover grayscale contrast-125">
+            <div class="grid gap-3 sm:grid-cols-3 lg:grid-cols-1">
+                @foreach ([['Free', 'Claim and edit your listing'], ['Featured', 'Shown first in your city and category'], ['Enquiries', 'Leads land in your inbox']] as [$t, $d])
+                    <div class="rounded-2xl bg-on-accent/10 p-4">
+                        <p class="font-display font-semibold text-on-accent">{{ $t }}</p>
+                        <p class="text-sm text-on-accent/75">{{ $d }}</p>
+                    </div>
+                @endforeach
             </div>
         </div>
     </section>

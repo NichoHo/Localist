@@ -7,124 +7,157 @@
         [$business->name, route('business', $business)],
     ])" />
 
-    <div class="mx-auto max-w-[76rem] px-4 py-10 sm:px-6 sm:py-12">
-        <x-breadcrumbs :items="[
+    @php
+        $open = $business->isOpenNow();
+        $statusLabel = $business->openStatusLabel();
+        $dayKeys = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'];
+        $today = $dayKeys[now($business->city->timezone ?? 'Asia/Kuala_Lumpur')->dayOfWeekIso - 1];
+        $todaySlot = $business->hours[$today] ?? null;
+        $todayText = $todaySlot ? (($todaySlot['closed'] ?? false) ? 'Closed' : ($todaySlot['open'] ?? '').' – '.($todaySlot['close'] ?? '')) : null;
+        $directions = ($business->lat && $business->lng)
+            ? 'https://www.google.com/maps/dir/?api=1&destination='.$business->lat.','.$business->lng
+            : ($business->address ? 'https://www.google.com/maps/dir/?api=1&destination='.urlencode($business->name.' '.$business->address) : null);
+        $categoryUrl = route('city.category', [$business->city, $business->category]);
+    @endphp
+
+    <div class="mx-auto max-w-[76rem] px-4 py-4 sm:px-6 lg:py-10">
+        {{-- Desktop: breadcrumbs. Mobile: a single back link, like an app. --}}
+        <x-breadcrumbs class="hidden lg:flex" :items="[
             ['Home', route('home')],
             [$business->city->name, route('city', $business->city)],
-            [$business->category->name, route('city.category', [$business->city, $business->category])],
+            [$business->category->name, $categoryUrl],
             [$business->name, null],
         ]" />
+        <a href="{{ $categoryUrl }}" class="-ml-1 inline-flex items-center gap-1 rounded-full py-2 pr-3 text-sm font-medium text-ink-muted transition-colors hover:text-ink lg:hidden">
+            <x-icon name="chevron-left" class="size-5" />{{ $business->category->name }} in {{ $business->city->name }}
+        </a>
 
-        <div class="mt-6 grid gap-10 lg:grid-cols-[1fr_22rem]">
-            <div class="min-w-0">
-                <div class="flex flex-wrap items-center gap-3">
-                    <h1 class="font-display text-3xl font-bold text-ink sm:text-4xl">{{ $business->name }}</h1>
-                    @if ($business->isFeatured())
-                        <span class="featured-tag">Featured</span>
-                    @endif
-                    @if ($label = $business->openStatusLabel())
-                        <span @class(['status-pill', 'status-open' => $business->isOpenNow(), 'status-shut' => ! $business->isOpenNow()])>{{ $label }}</span>
-                    @endif
-                </div>
-                <p class="mt-2 text-ink-muted">{{ $business->category->name }} &middot; {{ $business->city->name }}, {{ $business->city->region }}</p>
-
-                <div class="mt-6 flex flex-wrap gap-3">
-                    @if ($business->phone)
-                        <a href="tel:{{ $business->phone }}" class="btn btn-primary">Call {{ $business->phone }}</a>
-                    @endif
-                    <a href="#enquire" class="btn btn-ghost">Send an enquiry</a>
-                </div>
-
-                @if ($business->description)
-                    <div class="mt-6 max-w-[45rem]">
-                        <p class="text-[1.0625rem] leading-relaxed text-ink-muted">{{ $business->description }}</p>
-                    </div>
+        <div class="mt-3 lg:mt-6">
+            <span class="icon-tile mb-4 size-14 lg:hidden"><x-category-icon :slug="$business->category->slug" class="size-7" /></span>
+            <h1 class="font-display text-[2rem] font-bold leading-[1.05] tracking-[-0.03em] text-ink sm:text-4xl lg:text-5xl">{{ $business->name }}</h1>
+            <div class="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1.5 text-ink-muted">
+                <span>{{ $business->category->name }} &middot; {{ $business->city->name }}, {{ $business->city->region }}</span>
+                @if ($business->isFeatured())
+                    <span class="featured-tag">Featured</span>
                 @endif
-
-                @if ($business->media->isNotEmpty())
-                    <div class="mt-8 grid grid-cols-2 gap-3 sm:grid-cols-3">
-                        @foreach ($business->media as $photo)
-                            <img src="{{ Storage::disk(config('filesystems.photo_disk'))->url($photo->path) }}" alt="{{ $photo->alt }}" loading="lazy"
-                                class="aspect-square w-full rounded-md border border-line object-cover">
-                        @endforeach
-                    </div>
-                @endif
-
-                @if ($business->lat && $business->lng)
-                    <div class="mt-8 overflow-hidden rounded-md border border-line">
-                        <iframe title="Map showing {{ $business->name }}" width="100%" height="320" loading="lazy"
-                            referrerpolicy="no-referrer-when-downgrade"
-                            src="https://maps.google.com/maps?q={{ $business->lat }},{{ $business->lng }}&z=15&output=embed"></iframe>
-                    </div>
-                @endif
-
-                @if ($related->isNotEmpty())
-                    <div class="mt-14">
-                        <h2 class="font-display text-xl font-bold text-ink">More {{ strtolower($business->category->name) }} in {{ $business->city->name }}</h2>
-                        <div class="business-list mt-5">
-                            @foreach ($related as $other)
-                                <x-business-card :business="$other" :hide-category="true" />
-                            @endforeach
-                        </div>
-                    </div>
-                @endif
+                @unless ($business->user_id)
+                    <a href="{{ route('claim', $business) }}" class="text-sm font-medium text-ink underline decoration-line-strong underline-offset-4 transition-colors hover:decoration-ink lg:hidden">Is this your business?</a>
+                @endunless
             </div>
+        </div>
 
-            <aside class="space-y-5">
-                <div class="surface-card p-6">
-                    <h2 class="font-display text-base font-bold text-ink">Contact</h2>
-                    <dl class="mt-4 space-y-4 text-sm">
+        {{-- Status: a soft banner on mobile, a four-cell strip on desktop --}}
+        @if ($statusLabel)
+            <div @class(['mt-5 flex items-center gap-3 rounded-2xl px-4 py-3 lg:hidden', 'bg-success-soft' => $open, 'bg-sunken' => ! $open])>
+                <span @class(['size-2.5 rounded-full', 'bg-success' => $open, 'bg-ink-subtle' => ! $open])></span>
+                <div class="text-sm">
+                    <p @class(['font-semibold', 'text-success-text' => $open, 'text-ink' => ! $open])>{{ $statusLabel }}</p>
+                    @if ($todayText)<p class="text-ink-muted">Today {{ $todayText }}</p>@endif
+                </div>
+            </div>
+            <dl class="mt-6 hidden grid-cols-4 divide-x divide-line overflow-hidden rounded-2xl border border-line bg-surface lg:grid">
+                <div class="px-5 py-4"><dt class="text-xs text-ink-subtle">Status</dt><dd @class(['mt-0.5 font-semibold', 'text-success-text' => $open, 'text-ink' => ! $open])>{{ $statusLabel }}</dd></div>
+                <div class="px-5 py-4"><dt class="text-xs text-ink-subtle">Category</dt><dd class="mt-0.5 font-medium text-ink">{{ $business->category->name }}</dd></div>
+                <div class="px-5 py-4"><dt class="text-xs text-ink-subtle">City</dt><dd class="mt-0.5 font-medium text-ink">{{ $business->city->name }}</dd></div>
+                <div class="px-5 py-4"><dt class="text-xs text-ink-subtle">Today</dt><dd class="mt-0.5 font-medium tabular-nums text-ink">{{ $todayText ?? 'Not listed' }}</dd></div>
+            </dl>
+        @endif
+
+        <div class="mt-8 grid gap-8 lg:mt-10 lg:grid-cols-[1fr_22rem] lg:gap-12">
+            <div class="min-w-0 space-y-8 lg:space-y-10">
+                @if ($business->description)
+                    <section>
+                        <h2 class="font-display text-xl font-bold tracking-tight text-ink lg:text-2xl">About</h2>
+                        <p class="mt-3 max-w-[45rem] text-[1.0625rem] leading-relaxed text-ink-muted">{{ $business->description }}</p>
+                    </section>
+                @endif
+
+                @if ($business->hours)
+                    <section>
+                        <details open class="surface-card group overflow-hidden">
+                            <summary class="flex cursor-pointer list-none items-center justify-between gap-4 px-5 py-4 lg:pointer-events-none lg:px-6 lg:py-5 [&::-webkit-details-marker]:hidden">
+                                <span class="font-display text-xl font-bold tracking-tight text-ink lg:text-2xl">Opening hours</span>
+                                <x-icon name="chevron-down" class="size-5 text-ink-subtle transition-transform group-open:rotate-180 lg:hidden" />
+                            </summary>
+                            <dl class="divide-y divide-line border-t border-line">
+                                @foreach ($business->hours as $day => $slot)
+                                    <div @class(['flex items-center justify-between gap-4 px-5 py-2.5 text-sm lg:px-6', 'bg-accent-soft' => $day === $today])>
+                                        <dt @class(['capitalize', 'font-semibold text-ink' => $day === $today, 'text-ink-muted' => $day !== $today])>{{ ['mon' => 'Monday', 'tue' => 'Tuesday', 'wed' => 'Wednesday', 'thu' => 'Thursday', 'fri' => 'Friday', 'sat' => 'Saturday', 'sun' => 'Sunday'][$day] ?? $day }}@if ($day === $today) <span class="ml-1 text-xs font-medium text-ink-muted">Today</span>@endif</dt>
+                                        <dd @class(['tabular-nums', 'text-ink-subtle' => ($slot['closed'] ?? false), 'font-medium text-ink' => ! ($slot['closed'] ?? false)])>{{ ($slot['closed'] ?? false) ? 'Closed' : ($slot['open'] ?? '').' – '.($slot['close'] ?? '') }}</dd>
+                                    </div>
+                                @endforeach
+                            </dl>
+                        </details>
+                    </section>
+                @endif
+
+                <section>
+                    <h2 class="font-display text-xl font-bold tracking-tight text-ink lg:text-2xl">Find us</h2>
+                    <dl class="surface-card mt-4 space-y-4 p-5 text-sm lg:p-6">
                         @if ($business->address)
                             <div class="flex gap-3">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="mt-0.5 size-4.5 shrink-0 text-ink-subtle" aria-hidden="true">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z" />
-                                </svg>
+                                <x-icon name="pin" class="mt-0.5 size-[18px] text-ink-subtle" />
                                 <div><dt class="text-ink-subtle">Address</dt><dd class="mt-0.5 text-ink">{{ $business->address }}</dd></div>
                             </div>
                         @endif
                         @if ($business->phone)
                             <div class="flex gap-3">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="mt-0.5 size-4.5 shrink-0 text-ink-subtle" aria-hidden="true">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 6.75c0 8.28 6.72 15 15 15h2.25a2.25 2.25 0 0 0 2.25-2.25v-1.37c0-.52-.35-.97-.85-1.09l-4.42-1.11c-.44-.11-.9.06-1.17.42l-.97 1.29c-.28.38-.77.54-1.21.38a12.04 12.04 0 0 1-7.14-7.14c-.16-.44 0-.93.38-1.21l1.29-.97c.36-.27.53-.73.42-1.17L6.96 3.1a1.13 1.13 0 0 0-1.09-.85H4.5A2.25 2.25 0 0 0 2.25 4.5z" />
-                                </svg>
-                                <div><dt class="text-ink-subtle">Phone</dt><dd class="mt-0.5"><a href="tel:{{ $business->phone }}" class="font-mono font-medium text-ink hover:underline">{{ $business->phone }}</a></dd></div>
+                                <x-icon name="phone" class="mt-0.5 size-[18px] text-ink-subtle" />
+                                <div><dt class="text-ink-subtle">Phone</dt><dd class="mt-0.5"><a href="tel:{{ $business->phone }}" class="font-medium tabular-nums text-ink hover:underline">{{ $business->phone }}</a></dd></div>
                             </div>
                         @endif
                         @if ($business->website && $business->plan->allows_website)
                             <div class="flex gap-3">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="mt-0.5 size-4.5 shrink-0 text-ink-subtle" aria-hidden="true">
-                                    <circle cx="12" cy="12" r="9" /><path stroke-linecap="round" stroke-linejoin="round" d="M3.5 9h17M3.5 15h17M12 3a13 13 0 0 1 0 18 13 13 0 0 1 0-18Z" />
-                                </svg>
+                                <x-icon name="globe" class="mt-0.5 size-[18px] text-ink-subtle" />
                                 <div class="min-w-0"><dt class="text-ink-subtle">Website</dt><dd class="mt-0.5"><a href="{{ $business->website }}" rel="nofollow" class="break-all font-medium text-ink hover:underline">{{ $business->website }}</a></dd></div>
                             </div>
                         @endif
+                        @if ($directions)
+                            <a href="{{ $directions }}" target="_blank" rel="noopener" class="btn btn-ghost w-full lg:hidden"><x-icon name="navigation" class="size-4" />Get directions</a>
+                        @endif
                     </dl>
-                </div>
+                </section>
 
-                @if ($business->hours)
-                    <div class="surface-card p-6">
-                        <div class="flex items-center justify-between gap-4">
-                            <h2 class="font-display text-base font-bold text-ink">Opening hours</h2>
-                            <span @class(['status-pill', 'status-open' => $business->isOpenNow(), 'status-shut' => ! $business->isOpenNow()])>{{ $business->openStatusLabel() }}</span>
-                        </div>
-                        <dl class="mt-4 space-y-2.5 text-sm">
-                            @php $today = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'][now($business->city->timezone ?? 'Asia/Kuala_Lumpur')->dayOfWeekIso - 1]; @endphp
-                            @foreach ($business->hours as $day => $slot)
-                                <div @class(['flex items-center justify-between gap-4 rounded px-2 -mx-2', 'bg-canvas-2' => $day === $today])>
-                                    <dt @class(['text-xs font-medium uppercase tracking-wide', 'text-ink' => $day === $today, 'text-ink-subtle' => $day !== $today])>{{ ucfirst($day) }}</dt>
-                                    <dd @class(['font-mono tabular-nums', 'text-ink-subtle' => ($slot['closed'] ?? false), 'font-medium text-ink' => ! ($slot['closed'] ?? false)])>{{ ($slot['closed'] ?? false) ? 'Closed' : ($slot['open'] ?? '').' – '.($slot['close'] ?? '') }}</dd>
-                                </div>
-                            @endforeach
-                        </dl>
+                @if ($business->media->isNotEmpty())
+                    <div class="grid grid-cols-2 gap-3 sm:grid-cols-3">
+                        @foreach ($business->media as $photo)
+                            <img src="{{ Storage::disk(config('filesystems.photo_disk'))->url($photo->path) }}" alt="{{ $photo->alt }}" loading="lazy"
+                                class="aspect-square w-full rounded-2xl border border-line object-cover">
+                        @endforeach
                     </div>
                 @endif
 
-                <div id="enquire" class="surface-card scroll-mt-20 p-6">
-                    <h2 class="font-display text-base font-bold text-ink">Send an enquiry</h2>
+                @if ($business->lat && $business->lng)
+                    <div class="overflow-hidden rounded-2xl border border-line">
+                        <iframe title="Map showing {{ $business->name }}" width="100%" height="320" loading="lazy"
+                            referrerpolicy="no-referrer-when-downgrade"
+                            src="https://maps.google.com/maps?q={{ $business->lat }},{{ $business->lng }}&z=15&output=embed"></iframe>
+                    </div>
+                @endif
+            </div>
+
+            <aside class="space-y-5 lg:sticky lg:top-24 lg:self-start">
+                {{-- Desktop only: the mobile call button lives in the sticky bottom bar --}}
+                @if ($business->phone)
+                    <div class="surface-card hidden p-6 lg:block">
+                        <p class="text-sm text-ink-muted">Call the shop</p>
+                        <p class="mt-1 font-display text-2xl font-bold tabular-nums tracking-tight text-ink">{{ $business->phone }}</p>
+                        <div class="mt-5 grid grid-cols-2 gap-2">
+                            <a href="tel:{{ $business->phone }}" class="btn btn-primary"><x-icon name="phone" class="size-4" />Call</a>
+                            @if ($directions)
+                                <a href="{{ $directions }}" target="_blank" rel="noopener" class="btn btn-ghost"><x-icon name="navigation" class="size-4" />Directions</a>
+                            @else
+                                <a href="#enquire" class="btn btn-ghost">Enquire</a>
+                            @endif
+                        </div>
+                    </div>
+                @endif
+
+                <div id="enquire" class="surface-card scroll-mt-24 p-5 lg:p-6">
+                    <h2 class="font-display text-lg font-bold text-ink">Send an enquiry</h2>
                     @if (session('enquiry_sent'))
                         <div class="mt-4 flex items-start gap-2.5 rounded-xl bg-success-soft p-4 text-sm">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="mt-0.5 size-4.5 shrink-0 text-success" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" /></svg>
+                            <x-icon name="check" class="mt-0.5 size-[18px] shrink-0 text-success" />
                             <p class="font-medium text-success-text">Thanks! Your enquiry has been sent.</p>
                         </div>
                     @else
@@ -157,16 +190,41 @@
                 </div>
 
                 @unless ($business->user_id)
-                    <div class="rounded-md border border-dashed border-line-strong bg-canvas-2 p-5 text-sm">
+                    <div class="rounded-2xl border border-dashed border-line-strong bg-canvas-2 p-5 text-sm">
                         <p class="font-medium text-ink">Is this your business?</p>
-                        <a href="{{ route('claim', $business) }}" class="mt-1 inline-flex items-center gap-1 font-semibold text-brand hover:underline">
+                        <a href="{{ route('claim', $business) }}" class="mt-1 inline-flex items-center gap-1 font-semibold text-ink underline decoration-line-strong underline-offset-4 transition-colors hover:decoration-ink">
                             Claim this listing
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="size-4" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" /></svg>
+                            <x-icon name="arrow-up-right" class="size-4" />
                         </a>
                     </div>
                 @endunless
             </aside>
         </div>
+
+        @if ($related->isNotEmpty())
+            <section class="mt-14 lg:mt-20">
+                <h2 class="font-display text-xl font-bold tracking-tight text-ink lg:text-2xl">More {{ strtolower($business->category->name) }} in {{ $business->city->name }}</h2>
+                <div class="business-list mt-5">
+                    @foreach ($related as $other)
+                        <x-business-card :business="$other" :hide-category="true" />
+                    @endforeach
+                </div>
+            </section>
+        @endif
     </div>
+
+    {{-- Mobile bottom action bar (replaces the tab bar on this page) --}}
+    <x-slot:actions>
+        <div class="fixed inset-x-0 bottom-0 z-40 flex gap-2 border-t border-line bg-surface/95 px-4 pt-3 backdrop-blur lg:hidden" style="padding-bottom: max(0.75rem, env(safe-area-inset-bottom))">
+            @if ($business->phone)
+                <a href="tel:{{ $business->phone }}" class="btn btn-primary btn-lg flex-1"><x-icon name="phone" class="size-5" />Call now</a>
+            @endif
+            @if ($directions)
+                <a href="{{ $directions }}" target="_blank" rel="noopener" aria-label="Directions" class="row-action row-action-view size-12"><x-icon name="navigation" class="size-5" /></a>
+            @endif
+            <a href="#enquire" aria-label="Send an enquiry" class="row-action row-action-view size-12"><x-icon name="message" class="size-5" /></a>
+        </div>
+    </x-slot:actions>
+
     <script>navigator.sendBeacon('{{ route('business.view', $business) }}');</script>
 </x-public-layout>

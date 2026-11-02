@@ -1,5 +1,5 @@
-<div class="mx-auto max-w-3xl px-4 py-10 sm:px-6 sm:py-12">
-    <h1 class="font-display text-2xl font-bold text-ink sm:text-3xl">Photos</h1>
+<div class="mx-auto max-w-3xl px-4 py-6 sm:px-6 lg:py-12">
+    <h1 class="font-display text-2xl font-bold tracking-tight text-ink sm:text-3xl">Photos</h1>
 
     @if (! $business)
         <div class="surface-card mt-8 border-dashed p-10 text-center">

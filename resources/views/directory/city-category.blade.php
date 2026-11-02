@@ -6,20 +6,20 @@
         [$category->name, route('city.category', [$city, $category])],
     ])" />
 
-    <div class="mx-auto max-w-[76rem] px-4 py-10 sm:px-6 sm:py-12">
+    <div class="mx-auto max-w-[76rem] px-4 py-6 sm:px-6 lg:py-12">
         <x-breadcrumbs :items="[['Home', route('home')], [$city->name, route('city', $city)], [$category->name, null]]" />
 
         <div class="mt-5 flex items-start gap-4">
-            <span class="grid size-12 shrink-0 place-items-center rounded-md bg-brand-soft text-brand ring-1 ring-inset ring-brand-line">
+            <span class="icon-tile size-12">
                 <x-category-icon :slug="$category->slug" class="size-6" />
             </span>
             <div>
-                <h1 class="font-display text-3xl font-bold text-ink sm:text-4xl">{{ $category->name }} in {{ $city->name }}</h1>
-                <p class="mt-1 text-ink-muted"><span class="font-mono font-medium text-ink">{{ number_format($businesses->total()) }}</span> businesses &middot; {{ $city->region }}</p>
+                <h1 class="font-display text-3xl font-bold tracking-[-0.03em] text-ink sm:text-4xl lg:text-5xl">{{ $category->name }} in {{ $city->name }}</h1>
+                <p class="mt-1 text-ink-muted"><span class="font-medium text-ink">{{ number_format($businesses->total()) }}</span> businesses &middot; {{ $city->region }}</p>
             </div>
         </div>
 
-        <div class="business-list mt-8">
+        <div class="business-list mt-6 lg:mt-8">
             @foreach ($businesses as $business)
                 <x-business-card :business="$business" />
             @endforeach
@@ -28,7 +28,7 @@
         <div class="mt-10">{{ $businesses->links() }}</div>
 
         @if ($nearbyCities->isNotEmpty())
-            <div class="mt-16 border-t border-line-subtle pt-8">
+            <div class="mt-14 border-t border-line pt-8">
                 <h2 class="font-display text-lg font-bold text-ink">{{ $category->name }} in nearby cities</h2>
                 <div class="mt-4 flex flex-wrap gap-2">
                     @foreach ($nearbyCities as $nearby)

@@ -18,6 +18,10 @@ class DirectoryController extends Controller
                 ->with(['category', 'city', 'plan'])->inRandomOrder()->limit(6)->get(),
             'cities' => City::withCount('businesses')->orderByDesc('businesses_count')->limit(12)->get(),
             'cityCount' => City::count(),
+            // Featured listings come first (ranked), then the rest. Short TTL since open/closed changes through the day.
+            'openNow' => cache()->remember('home.open_now_list', 300, fn () => Business::published()->ranked()
+                ->with(['category', 'city', 'plan'])->limit(80)->get()
+                ->filter(fn ($b) => $b->isOpenNow())->take(4)->values()),
         ]);
     }
 

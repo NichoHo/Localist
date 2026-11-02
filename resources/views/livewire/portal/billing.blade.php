@@ -6,15 +6,14 @@
         default => 'Standard',
     };
     $rows = [
-        'Photos' => fn ($p) => 'Up to '.$p->max_photos,
         'Website link' => fn ($p) => $p->allows_website ? 'Shown on listing' : 'Not shown',
         'Featured badge' => fn ($p) => $p->priority_rank > 0 ? 'Yes' : 'No',
         'Search placement' => $placement,
     ];
 @endphp
 
-<div class="mx-auto max-w-[70rem] px-4 py-10 sm:px-6 sm:py-12">
-    <h1 class="font-display text-2xl font-bold text-ink sm:text-3xl">Billing</h1>
+<div class="mx-auto max-w-[70rem] px-4 py-6 sm:px-6 lg:py-12">
+    <h1 class="font-display text-2xl font-bold tracking-tight text-ink sm:text-3xl">Billing</h1>
 
     @if (! $business)
         <div class="surface-card mt-8 border-dashed p-10 text-center">
@@ -25,9 +24,9 @@
     @else
         <p class="mt-1.5 text-ink-muted">{{ $business->name }}. Pick the placement that fits, and see every invoice in one place.</p>
 
-        @error('billing') <p class="mt-4 rounded-md bg-danger-soft px-4 py-3 text-sm font-medium text-danger-text" role="alert">{{ $message }}</p> @enderror
+        @error('billing') <p class="mt-4 rounded-xl bg-danger-soft px-4 py-3 text-sm font-medium text-danger-text" role="alert">{{ $message }}</p> @enderror
         <span x-data="{ show: false }" x-show="show" x-cloak x-on:saved.window="show = true; setTimeout(() => show = false, 3000)" role="status"
-            class="mt-4 inline-block rounded-md bg-success-soft px-3 py-1.5 text-sm font-medium text-success-text">Plan updated</span>
+            class="mt-4 inline-block rounded-xl bg-success-soft px-3 py-1.5 text-sm font-medium text-success-text">Plan updated</span>
 
         {{-- Where you stand today, and what a paid plan changes in the directory --}}
         <div class="mt-8 grid gap-6 lg:grid-cols-[1.15fr_1fr]">
@@ -59,17 +58,6 @@
                 </p>
 
                 <dl class="mt-6 grid grid-cols-2 gap-x-6 gap-y-5 border-t border-line pt-6">
-                    <div class="col-span-2">
-                        <dt class="flex items-baseline justify-between text-sm text-ink-muted">
-                            Photos used
-                            <span class="font-semibold tabular-nums text-ink">{{ $photoCount }} of {{ $business->plan->max_photos }}</span>
-                        </dt>
-                        <dd class="mt-2" role="meter" aria-valuemin="0" aria-valuemax="{{ $business->plan->max_photos }}" aria-valuenow="{{ $photoCount }}" aria-label="Photos used">
-                            <div class="h-1.5 overflow-hidden rounded-full bg-sunken">
-                                <div class="h-full rounded-full bg-brand" style="width: {{ $business->plan->max_photos ? min(100, round($photoCount / $business->plan->max_photos * 100)) : 0 }}%"></div>
-                            </div>
-                        </dd>
-                    </div>
                     <div>
                         <dt class="text-sm text-ink-muted">Listing views</dt>
                         <dd class="mt-1 text-xl font-bold tabular-nums text-ink">{{ number_format($business->views_count) }}</dd>
@@ -117,8 +105,8 @@
             <h2 class="font-display text-xl font-bold text-ink" id="compare-plans">Compare plans</h2>
             <p class="mt-1 max-w-2xl text-sm text-ink-muted">Prices are per month in Malaysian ringgit. Change or cancel whenever you like.</p>
             @if ($testMode)
-                <p class="mt-3 max-w-2xl rounded-md border border-accent-line bg-accent-soft px-4 py-2.5 text-sm text-accent-text">
-                    Stripe test mode is on. Pay with card <span class="font-mono font-semibold">4242 4242 4242 4242</span>, any future expiry and any CVC. No real money moves.
+                <p class="mt-3 max-w-2xl rounded-xl border border-accent-line bg-accent-soft px-4 py-2.5 text-sm text-accent-text">
+                    Stripe test mode is on. Pay with card <span class="font-semibold">4242 4242 4242 4242</span>, any future expiry and any CVC. No real money moves.
                 </p>
             @endif
 
@@ -130,7 +118,7 @@
                         <tr class="border-b border-line">
                             <td class="w-[22%]"></td>
                             @foreach ($plans as $plan)
-                                <th scope="col" @class(['p-5 align-top font-normal', 'bg-brand-soft' => $plan->id === $business->plan_id])>
+                                <th scope="col" @class(['p-5 align-top font-normal', 'bg-accent-soft/50' => $plan->id === $business->plan_id])>
                                     <span class="block font-display text-lg font-bold text-ink">{{ $plan->name }}</span>
                                     <span class="mt-1 block">
                                         <span class="text-xl font-bold tabular-nums text-ink">{{ $price($plan) }}</span>
@@ -146,7 +134,7 @@
                             <tr>
                                 <th scope="row" class="px-5 py-3.5 font-medium text-ink-muted">{{ $label }}</th>
                                 @foreach ($plans as $plan)
-                                    <td @class(['px-5 py-3.5 text-ink', 'bg-brand-soft' => $plan->id === $business->plan_id])>{{ $value($plan) }}</td>
+                                    <td @class(['px-5 py-3.5 text-ink', 'bg-accent-soft/50' => $plan->id === $business->plan_id])>{{ $value($plan) }}</td>
                                 @endforeach
                             </tr>
                         @endforeach
@@ -157,7 +145,7 @@
             {{-- Below md: one block per plan --}}
             <div class="mt-5 space-y-4 md:hidden">
                 @foreach ($plans as $plan)
-                    <div @class(['surface-card p-5', 'border-brand ring-1 ring-brand' => $plan->id === $business->plan_id])>
+                    <div @class(['surface-card p-5', 'border-ink' => $plan->id === $business->plan_id])>
                         <div class="flex items-baseline justify-between gap-3">
                             <h3 class="font-display text-lg font-bold text-ink">{{ $plan->name }}</h3>
                             <p><span class="text-xl font-bold tabular-nums text-ink">{{ $price($plan) }}</span><span class="text-sm text-ink-muted">/mo</span></p>

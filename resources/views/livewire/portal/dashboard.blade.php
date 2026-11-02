@@ -1,6 +1,6 @@
-<div class="mx-auto max-w-[70rem] px-4 py-10 sm:px-6 sm:py-12">
+<div class="mx-auto max-w-[70rem] px-4 py-6 sm:px-6 lg:py-12">
     @if (! $business)
-        <h1 class="font-display text-2xl font-bold text-ink sm:text-3xl">Dashboard</h1>
+        <h1 class="font-display text-2xl font-bold tracking-tight text-ink sm:text-3xl">Dashboard</h1>
         <div class="surface-card mt-8 border-dashed p-10 text-center">
             <p class="font-display text-lg font-bold text-ink">You haven&rsquo;t claimed a listing yet</p>
             <p class="mx-auto mt-2 max-w-md text-ink-muted">Find your business in the directory and claim it to start managing it here.</p>
@@ -10,7 +10,7 @@
         {{-- Header --}}
         <div class="flex flex-wrap items-start justify-between gap-4">
             <div>
-                <h1 class="font-display text-2xl font-bold text-ink sm:text-3xl">Dashboard</h1>
+                <h1 class="font-display text-2xl font-bold tracking-tight text-ink sm:text-3xl">Dashboard</h1>
                 <p class="mt-1.5 text-ink-muted">{{ $business->name }} · {{ $business->category->name }} · {{ $business->city->name }}</p>
             </div>
             <div class="flex flex-wrap gap-2">
@@ -45,7 +45,7 @@
                 <p class="flex items-center justify-between text-sm text-ink-muted">
                     Leads
                     @if ($unreadLeads > 0)
-                        <span class="rounded-full bg-brand px-1.5 text-xs font-semibold tabular-nums text-on-brand">{{ $unreadLeads }} new</span>
+                        <span class="rounded-full bg-accent px-2 text-xs font-semibold tabular-nums text-on-accent">{{ $unreadLeads }} new</span>
                     @endif
                 </p>
                 <p class="mt-2 text-2xl font-bold tabular-nums text-ink">{{ number_format($totalLeads) }}</p>
@@ -63,7 +63,7 @@
 
         {{-- Main grid: recent enquiries + listing panel --}}
         <div class="mt-6 grid gap-6 lg:grid-cols-[1.6fr_1fr]">
-            <section class="surface-card p-6">
+            <section class="surface-card min-w-0 p-6">
                 <div class="flex items-center justify-between gap-4">
                     <h2 class="font-display text-lg font-bold text-ink">Recent enquiries</h2>
                     <a href="{{ route('portal.leads') }}" class="text-sm font-medium text-brand hover:underline">View all</a>
@@ -77,7 +77,7 @@
                     <ul class="mt-2 divide-y divide-line-subtle">
                         @foreach ($recentLeads as $lead)
                             <li class="flex items-start gap-3 py-3.5">
-                                <span class="grid size-9 shrink-0 place-items-center rounded-full bg-brand-soft text-xs font-bold uppercase text-brand">{{ collect(explode(' ', $lead->name))->take(2)->map(fn ($w) => mb_substr($w, 0, 1))->implode('') }}</span>
+                                <span class="grid size-9 shrink-0 place-items-center rounded-full bg-accent-soft text-xs font-bold uppercase text-accent-text">{{ collect(explode(' ', $lead->name))->take(2)->map(fn ($w) => mb_substr($w, 0, 1))->implode('') }}</span>
                                 <div class="min-w-0 flex-1">
                                     <div class="flex items-center gap-2">
                                         <p class="truncate font-medium text-ink">{{ $lead->name }}</p>
@@ -94,13 +94,12 @@
                 @endif
             </section>
 
-            <aside class="space-y-6">
+            <aside class="min-w-0 space-y-6">
                 @php
                     $checks = [
                         ['Description added', filled($business->description), route('portal.edit')],
                         ['Phone number', filled($business->phone), route('portal.edit')],
                         ['Website link', filled($business->website), route('portal.edit')],
-                        ['At least one photo', $photoCount > 0, route('portal.photos')],
                         ['Opening hours', filled($business->hours), route('portal.edit')],
                     ];
                     $done = collect($checks)->filter(fn ($c) => $c[1])->count();
@@ -111,7 +110,7 @@
                         <span class="text-sm font-semibold tabular-nums text-ink-muted">{{ $done }}/{{ count($checks) }}</span>
                     </div>
                     <div class="mt-3 h-1.5 w-full overflow-hidden rounded-full bg-sunken">
-                        <div class="h-full rounded-full bg-brand transition-all" style="width: {{ round($done / count($checks) * 100) }}%"></div>
+                        <div class="h-full rounded-full bg-accent-strong transition-all" style="width: {{ round($done / count($checks) * 100) }}%"></div>
                     </div>
                     <ul class="mt-4 space-y-1">
                         @foreach ($checks as [$label, $ok, $href])
@@ -130,20 +129,14 @@
                             </li>
                         @endforeach
                     </ul>
-                    <div class="mt-5 flex flex-col gap-2 border-t border-line-subtle pt-5">
-                        <a href="{{ route('portal.photos') }}" class="btn btn-ghost w-full justify-between">
-                            Manage photos
-                            <span class="text-ink-subtle tabular-nums">{{ $photoCount }}/{{ $business->plan->max_photos }}</span>
-                        </a>
-                    </div>
                 </section>
 
                 @if ($business->plan->priority_rank === 0)
-                    <section class="overflow-hidden rounded-md">
+                    <section class="overflow-hidden rounded-2xl">
                         <div class="bg-accent p-6">
-                            <p class="text-xs font-semibold uppercase tracking-[0.14em] text-on-accent/65">Upgrade</p>
+                            <p class="text-sm font-semibold text-on-accent/65">Upgrade</p>
                             <h2 class="mt-2 font-display text-lg font-bold text-on-accent">Get featured placement</h2>
-                            <p class="mt-1.5 text-sm leading-relaxed text-on-accent/75">Rank above free listings, show your website link, and add more photos.</p>
+                            <p class="mt-1.5 text-sm leading-relaxed text-on-accent/75">Rank above free listings and show your website link.</p>
                             <a href="{{ route('portal.billing') }}" class="btn btn-on-accent mt-4 focus-visible:ring-offset-accent">See plans</a>
                         </div>
                     </section>

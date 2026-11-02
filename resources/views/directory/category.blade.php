@@ -1,22 +1,22 @@
 <x-public-layout :title="$category->name.' | Localist'" :description="'Find trusted '.strtolower($category->name).' near you. Compare '.number_format($businesses->total()).' local businesses on Localist.'">
     <x-json-ld :data="\App\Services\Seo::itemList($businesses->getCollection(), $category->name.' on Localist')" />
 
-    <div class="mx-auto max-w-[76rem] px-4 py-10 sm:px-6 sm:py-12">
+    <div class="mx-auto max-w-[76rem] px-4 py-6 sm:px-6 lg:py-12">
         <x-breadcrumbs :items="[['Home', route('home')], [$category->name, null]]" />
 
         <div class="mt-5 flex items-start gap-4">
-            <span class="grid size-12 shrink-0 place-items-center rounded-md bg-brand-soft text-brand ring-1 ring-inset ring-brand-line">
+            <span class="icon-tile size-12">
                 <x-category-icon :slug="$category->slug" class="size-6" />
             </span>
             <div>
-                <h1 class="font-display text-3xl font-bold text-ink sm:text-4xl">{{ $category->name }}</h1>
-                <p class="mt-1 text-ink-muted"><span class="font-mono font-medium text-ink">{{ number_format($businesses->total()) }}</span> businesses across Malaysia</p>
+                <h1 class="font-display text-3xl font-bold tracking-[-0.03em] text-ink sm:text-4xl lg:text-5xl">{{ $category->name }}</h1>
+                <p class="mt-1 text-ink-muted"><span class="font-medium text-ink">{{ number_format($businesses->total()) }}</span> businesses across Malaysia</p>
             </div>
         </div>
 
         @if ($cities->isNotEmpty())
             {{-- City filter — collapses to one row; "show more" is a CSS-only peer toggle (public pages have no Alpine) --}}
-            <div class="mt-8 flex flex-wrap gap-2">
+            <div class="mt-6 flex flex-wrap gap-2 lg:mt-8">
                 <input type="checkbox" id="more-cities" class="peer sr-only" aria-label="Show all cities">
                 <a href="{{ route('category', $category) }}" @class(['chip', 'chip-active' => ! request('city')])>All cities</a>
                 @foreach ($cities as $city)
@@ -34,7 +34,7 @@
             </div>
         @endif
 
-        <div class="business-list mt-8">
+        <div class="business-list mt-6 lg:mt-8">
             @foreach ($businesses as $business)
                 <x-business-card :business="$business" :hide-category="true" />
             @endforeach

@@ -1,11 +1,11 @@
-<div class="mx-auto max-w-3xl px-4 py-10 sm:px-6 sm:py-12"
+<div class="mx-auto max-w-3xl px-4 py-6 sm:px-6 lg:py-12"
     x-data="{ dirty: false, saved() { this.dirty = false; } }"
     x-on:input="dirty = true"
     x-on:change="dirty = true"
     x-on:saved.window="saved()"
     x-on:beforeunload.window="if (dirty) $event.preventDefault()">
 
-    <h1 class="font-display text-2xl font-bold text-ink sm:text-3xl">Edit listing</h1>
+    <h1 class="font-display text-2xl font-bold tracking-tight text-ink sm:text-3xl">Edit listing</h1>
 
     @if (! $business)
         <div class="surface-card mt-8 border-dashed p-10 text-center">
@@ -14,11 +14,12 @@
         </div>
     @else
         <p class="mt-1.5 text-sm text-ink-muted">
-            Public URL: <span class="font-mono text-ink">/business/{{ $this->slugPreview }}</span>
+            Public URL: <span class="font-medium text-ink">/business/{{ $this->slugPreview }}</span>
             @if ($this->slugPreview !== $business->slug)
                 <span class="ml-1 rounded-full bg-accent-soft px-2 py-0.5 text-xs font-semibold text-accent-text ring-1 ring-inset ring-accent-line">URL will change, a 301 redirect will be created</span>
             @endif
         </p>
+        <p class="mt-1.5 text-sm text-ink-muted">Have photos to show? <a href="{{ route('portal.photos') }}" class="font-medium text-ink underline decoration-line-strong underline-offset-4 hover:decoration-ink">Manage photos</a></p>
 
         <form wire:submit="save" class="mt-8 space-y-6">
             <div>
@@ -82,13 +83,13 @@
                 <legend class="text-sm font-medium text-ink">Opening hours</legend>
                 <div class="mt-3 space-y-2">
                     @foreach (\App\Livewire\Portal\EditListing::DAYS as $day)
-                        <div class="flex items-center gap-3" x-data="{ closed: $wire.entangle('hours.{{ $day }}.closed') }">
+                        <div class="flex flex-wrap items-center gap-x-3 gap-y-2" x-data="{ closed: $wire.entangle('hours.{{ $day }}.closed') }">
                             <span class="w-10 text-sm font-medium uppercase text-ink-subtle">{{ $day }}</span>
                             <input type="time" wire:model="hours.{{ $day }}.open" :disabled="closed" class="field w-auto py-2 disabled:bg-sunken disabled:text-ink-subtle">
                             <span class="text-ink-subtle">–</span>
                             <input type="time" wire:model="hours.{{ $day }}.close" :disabled="closed" class="field w-auto py-2 disabled:bg-sunken disabled:text-ink-subtle">
                             <label class="flex items-center gap-1.5 text-sm text-ink-muted">
-                                <input type="checkbox" x-model="closed" class="rounded border-line text-brand focus:ring-brand/30"> Closed
+                                <input type="checkbox" x-model="closed" class="rounded border-line text-ink focus:ring-ink/20"> Closed
                             </label>
                         </div>
                     @endforeach
