@@ -66,8 +66,8 @@
         <div class="mt-8 grid gap-8 lg:mt-10 lg:grid-cols-[1fr_22rem] lg:gap-12">
             <div class="min-w-0 space-y-8 lg:space-y-10">
                 @if ($business->description)
-                    <section>
-                        <h2 class="font-display text-xl font-bold tracking-tight text-ink lg:text-2xl">About</h2>
+                    <section class="surface-card p-5 lg:p-6">
+                        <h2 class="font-display text-xl font-bold tracking-tight text-ink">About</h2>
                         <p class="mt-3 max-w-[45rem] text-[1.0625rem] leading-relaxed text-ink-muted">{{ $business->description }}</p>
                     </section>
                 @endif
@@ -75,8 +75,8 @@
                 @if ($business->hours)
                     <section>
                         <details open class="surface-card group overflow-hidden">
-                            <summary class="flex cursor-pointer list-none items-center justify-between gap-4 px-5 py-4 lg:pointer-events-none lg:px-6 lg:py-5 [&::-webkit-details-marker]:hidden">
-                                <span class="font-display text-xl font-bold tracking-tight text-ink lg:text-2xl">Opening hours</span>
+                            <summary class="flex cursor-pointer list-none items-center justify-between gap-4 px-5 py-4 lg:pointer-events-none lg:px-6 lg:py-[1.125rem] [&::-webkit-details-marker]:hidden">
+                                <span class="font-display text-xl font-bold tracking-tight text-ink">Opening hours</span>
                                 <x-icon name="chevron-down" class="size-5 text-ink-subtle transition-transform group-open:rotate-180 lg:hidden" />
                             </summary>
                             <dl class="divide-y divide-line border-t border-line">
@@ -91,9 +91,9 @@
                     </section>
                 @endif
 
-                <section>
-                    <h2 class="font-display text-xl font-bold tracking-tight text-ink lg:text-2xl">Find us</h2>
-                    <dl class="surface-card mt-4 space-y-4 p-5 text-sm lg:p-6">
+                <section class="surface-card p-5 lg:p-6">
+                    <h2 class="font-display text-xl font-bold tracking-tight text-ink">Find us</h2>
+                    <dl class="mt-4 space-y-4 text-sm">
                         @if ($business->address)
                             <div class="flex gap-3">
                                 <x-icon name="pin" class="mt-0.5 size-[18px] text-ink-subtle" />

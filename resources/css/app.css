@@ -203,6 +203,16 @@
         .business-list > .biz:hover {
             @apply border-line-strong;
         }
+        /* Short lists fill their rows: three across, never a lone card on a second row. */
+        .business-list:has(> .biz:nth-child(3):last-child) {
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+        }
+    }
+    /* Four items: 2x2 on laptops (above), one row of four on wide screens. */
+    @media (min-width: 80rem) {
+        .business-list:has(> .biz:nth-child(4):last-child) {
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+        }
     }
 
     /* Pills / filter chips */
