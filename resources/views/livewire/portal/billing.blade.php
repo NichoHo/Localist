@@ -29,7 +29,7 @@
             class="mt-4 inline-block rounded-xl bg-success-soft px-3 py-1.5 text-sm font-medium text-success-text">Plan updated</span>
 
         {{-- Where you stand today, and what a paid plan changes in the directory --}}
-        <div class="mt-8 grid gap-6 lg:grid-cols-[1.15fr_1fr]">
+        <div class="mt-8 grid gap-6 lg:grid-cols-[1.15fr_1fr] lg:items-start">
             <section class="surface-card p-6" aria-labelledby="current-plan">
                 <div class="flex flex-wrap items-start justify-between gap-3">
                     <div>
@@ -82,18 +82,18 @@
                     {{ $upgradePreview ? 'How a paid plan changes your listing' : 'How your listing appears' }}
                 </h2>
                 <p class="mt-1 text-sm text-ink-muted">
-                    {{ $upgradePreview ? 'Featured listings get the yellow icon and a badge, and sort above free ones in every category and city.' : 'This is the row visitors see in search, category and city pages.' }}
+                    {{ $upgradePreview ? 'Featured listings get a yellow Featured badge and a light yellow tint, and sort above free ones in every category and city.' : 'This is the row visitors see in search, category and city pages.' }}
                 </p>
 
                 <div class="mt-4 space-y-3">
                     <div>
                         @if ($upgradePreview)<p class="mb-1.5 text-xs font-semibold text-ink-subtle">Today, on Free</p>@endif
-                        <div class="business-list"><x-business-card :business="$business" /></div>
+                        <div class="business-list lg:grid-cols-1"><x-business-card :business="$business" /></div>
                     </div>
                     @if ($upgradePreview)
                         <div>
                             <p class="mb-1.5 text-xs font-semibold text-ink-subtle">With {{ $upgradePreview->plan->name }}</p>
-                            <div class="business-list"><x-business-card :business="$upgradePreview" /></div>
+                            <div class="business-list lg:grid-cols-1"><x-business-card :business="$upgradePreview" /></div>
                         </div>
                     @endif
                 </div>
