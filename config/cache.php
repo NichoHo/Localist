@@ -18,6 +18,13 @@ return [
     'default' => env('CACHE_STORE', 'database'),
 
     /*
+    | Rate-limit counters (throttle middleware) use their own store. The database
+    | store runs increments in a transaction, which aborts on Postgres under
+    | concurrent hits (SQLSTATE 25P02) and turns throttled routes into a 500.
+    */
+    'limiter' => env('CACHE_LIMITER', 'file'),
+
+    /*
     |--------------------------------------------------------------------------
     | Cache Stores
     |--------------------------------------------------------------------------

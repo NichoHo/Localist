@@ -57,12 +57,19 @@ class Billing extends Component
             return;
         }
 
-        $session = $user
-            ->newSubscription('default', $price)
-            ->checkout([
-                'success_url' => route('portal.billing').'?session_id={CHECKOUT_SESSION_ID}',
-                'cancel_url' => route('portal.billing'),
-            ]);
+        try {
+            $session = $user
+                ->newSubscription('default', $price)
+                ->checkout([
+                    'success_url' => route('portal.billing').'?session_id={CHECKOUT_SESSION_ID}',
+                    'cancel_url' => route('portal.billing'),
+                ]);
+        } catch (\Throwable $e) {
+            report($e);
+            $this->addError('billing', 'Could not start checkout. Please try again in a moment.');
+
+            return;
+        }
 
         // Cashier's own redirect() clashes with Livewire's redirector, so send the URL ourselves.
         return $this->redirect($session->url);
