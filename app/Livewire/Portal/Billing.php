@@ -66,7 +66,9 @@ class Billing extends Component
                 ]);
         } catch (\Throwable $e) {
             report($e);
-            $this->addError('billing', 'Could not start checkout. Please try again in a moment.');
+            // In Stripe test mode, show the real reason so setup mistakes are easy to spot.
+            $detail = str_starts_with((string) config('cashier.key'), 'pk_test') ? ' ('.$e->getMessage().')' : '';
+            $this->addError('billing', 'Could not start checkout. Please try again in a moment.'.$detail);
 
             return;
         }
