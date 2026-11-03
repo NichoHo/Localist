@@ -24,7 +24,7 @@
     @else
         <p class="mt-1.5 text-ink-muted">{{ $business->name }}. Pick the placement that fits, and see every invoice in one place.</p>
 
-        @error('billing') <p class="mt-4 rounded-xl bg-danger-soft px-4 py-3 text-sm font-medium text-danger-text" role="alert">{{ $message }}</p> @enderror
+        @error('billing') <p x-data x-init="$el.scrollIntoView({ block: 'center', behavior: 'smooth' })" class="mt-4 rounded-xl bg-danger-soft px-4 py-3 text-sm font-medium text-danger-text" role="alert">{{ $message }}</p> @enderror
         <span x-data="{ show: false }" x-show="show" x-cloak x-on:saved.window="show = true; setTimeout(() => show = false, 3000)" role="status"
             class="mt-4 inline-block rounded-xl bg-success-soft px-3 py-1.5 text-sm font-medium text-success-text">Plan updated</span>
 
