@@ -35,6 +35,7 @@ class Billing extends Component
         }
 
         $user = auth()->user();
+        logger()->info('billing.checkout', ['user' => $user->id, 'plan' => $plan->name, 'has_active_subscription' => (bool) $user->subscription('default')?->active()]);
 
         // Already subscribed: change the price on that subscription. A second Checkout would bill twice.
         if (($subscription = $user->subscription('default'))?->active()) {
@@ -72,6 +73,8 @@ class Billing extends Component
 
             return;
         }
+
+        logger()->info('billing.checkout.redirect', ['url' => $session->url]);
 
         // Cashier's own redirect() clashes with Livewire's redirector, so send the URL ourselves.
         return $this->redirect($session->url);
