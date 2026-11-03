@@ -89,7 +89,7 @@
                             <span class="text-ink-subtle">–</span>
                             <input type="time" wire:model="hours.{{ $day }}.close" :disabled="closed" class="field w-auto py-2 disabled:bg-sunken disabled:text-ink-subtle">
                             <label class="flex items-center gap-1.5 text-sm text-ink-muted">
-                                <input type="checkbox" x-model="closed" class="rounded border-line text-ink focus:ring-ink/20"> Closed
+                                <input type="checkbox" x-model="closed"> Closed
                             </label>
                         </div>
                     @endforeach
