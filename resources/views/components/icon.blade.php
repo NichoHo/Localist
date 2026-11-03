@@ -57,6 +57,9 @@
         @case('card')
             <rect x="2.5" y="5" width="19" height="14" rx="2.5" /><path d="M2.5 10h19" />
             @break
+        @case('star')
+            <path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1-4.4-4.3 6.1-.9z" fill="currentColor" stroke="none" />
+            @break
         @case('shield')
             <path d="M12 3 4 6v6c0 5 3.4 8.2 8 9 4.6-.8 8-4 8-9V6z" /><path d="m9 12 2.2 2.2L15.5 10" />
             @break

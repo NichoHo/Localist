@@ -38,7 +38,7 @@
             <div class="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1.5 text-ink-muted">
                 <span>{{ $business->category->name }} &middot; {{ $business->city->name }}, {{ $business->city->region }}</span>
                 @if ($business->isFeatured())
-                    <span class="featured-tag">Featured</span>
+                    <span class="featured-tag"><x-icon name="star" class="size-3" />Featured</span>
                 @endif
                 @unless ($business->user_id)
                     <a href="{{ route('claim', $business) }}" class="text-sm font-medium text-ink underline decoration-line-strong underline-offset-4 transition-colors hover:decoration-ink lg:hidden">Is this your business?</a>

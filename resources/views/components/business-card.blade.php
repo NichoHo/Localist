@@ -11,22 +11,20 @@
     $label = $business->openStatusLabel();
     $open = $business->isOpenNow();
 @endphp
-<div class="biz">
+<div @class(['biz', 'biz-featured' => $business->isFeatured()])>
     <a href="{{ route('business', $business) }}" class="group flex min-w-0 flex-1 items-center gap-3.5 lg:flex-none lg:flex-col lg:items-stretch lg:gap-4">
         <div class="flex items-start justify-between gap-3">
             <span class="icon-tile size-12 lg:size-11"><x-category-icon :slug="$business->category->slug" class="size-5" /></span>
             @if ($business->isFeatured())
-                <span class="featured-tag hidden lg:inline-flex">Featured</span>
+                <span class="featured-tag hidden lg:inline-flex"><x-icon name="star" class="size-3" />Featured</span>
             @endif
         </div>
 
         <div class="min-w-0 flex-1 lg:flex-none">
-            <div class="flex items-center gap-2">
-                <h3 class="truncate text-base font-semibold leading-snug text-ink lg:whitespace-normal lg:text-lg">{{ $business->name }}</h3>
-                @if ($business->isFeatured())
-                    <span class="featured-tag shrink-0 lg:hidden">Featured</span>
-                @endif
-            </div>
+            @if ($business->isFeatured())
+                <span class="featured-tag mb-1 lg:hidden"><x-icon name="star" class="size-3" />Featured</span>
+            @endif
+            <h3 class="truncate text-base font-semibold leading-snug text-ink lg:whitespace-normal lg:text-lg">{{ $business->name }}</h3>
             <p class="mt-0.5 truncate text-sm text-ink-muted lg:whitespace-normal">
                 @unless ($hideCategory)
                     {{ $business->category->name }} &middot;

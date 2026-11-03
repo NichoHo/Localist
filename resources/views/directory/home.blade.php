@@ -57,7 +57,7 @@
                                     <span class="block truncate text-sm text-ink-muted">{{ $business->category->name }} &middot; {{ $business->city->name }}</span>
                                 </span>
                                 @if ($business->isFeatured())
-                                    <span class="featured-tag shrink-0">Featured</span>
+                                    <span class="featured-tag shrink-0"><x-icon name="star" class="size-3" />Featured</span>
                                 @endif
                             </a>
                         </li>
@@ -74,7 +74,7 @@
                 <h2 class="font-display text-2xl font-bold tracking-tight text-ink lg:text-3xl">Featured businesses</h2>
                 <p class="mt-1 text-ink-muted">Paid placement, shown first.</p>
             </div>
-            <div class="business-list">
+            <div class="business-list no-tint">
                 @foreach ($featured as $business)
                     <x-business-card :business="$business" />
                 @endforeach

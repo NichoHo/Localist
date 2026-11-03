@@ -208,6 +208,14 @@
             grid-template-columns: repeat(3, minmax(0, 1fr));
         }
     }
+    /* Featured rows and cards: a barely-there yellow wash on the surface. */
+    .business-list > .biz-featured {
+        background-color: color-mix(in srgb, var(--accent-soft) 40%, var(--surface));
+    }
+    /* A list that is entirely featured (home, city) has nothing to tell apart, so no wash. */
+    .business-list.no-tint > .biz-featured {
+        background-color: var(--surface);
+    }
     /* Four items: 2x2 on laptops (above), one row of four on wide screens. */
     @media (min-width: 80rem) {
         .business-list:has(> .biz:nth-child(4):last-child) {
@@ -244,16 +252,10 @@
         @apply bg-ink-subtle;
     }
 
-    /* Paid placement, kept quiet: a small label with a yellow dot, no box, no outline. */
-    .featured-tag {
-        @apply inline-flex items-center gap-1.5 text-xs font-medium text-ink-muted;
-    }
-    .featured-tag::before {
-        content: '';
-        @apply inline-block size-1.5 shrink-0 rounded-full bg-accent;
-    }
-    .featured-flag {
-        @apply inline-flex shrink-0 items-center rounded-full bg-accent-soft px-2.5 py-0.5 text-xs font-semibold text-accent-text;
+    /* Paid placement: a small solid yellow pill with a star. The card or row also takes a
+       faint yellow tint (.biz-featured below). No outline, no glow. */
+    .featured-tag, .featured-flag {
+        @apply inline-flex shrink-0 items-center gap-1 rounded-full bg-accent px-2.5 py-0.5 text-xs font-semibold text-on-accent;
     }
 
     /* Row action — a round icon target. Call is the yellow one. */

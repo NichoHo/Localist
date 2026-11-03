@@ -37,7 +37,7 @@
                         <p class="mt-1 flex items-center gap-2.5 font-display text-2xl font-bold text-ink">
                             {{ $business->plan->name }}
                             @if ($business->plan->priority_rank > 0)
-                                <span class="featured-flag">Featured</span>
+                                <span class="featured-flag"><x-icon name="star" class="size-3" />Featured</span>
                             @endif
                         </p>
                     </div>

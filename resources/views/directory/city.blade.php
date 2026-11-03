@@ -11,7 +11,7 @@
         @if ($featured->isNotEmpty())
             <div class="mt-8 lg:mt-10">
                 <h2 class="font-display text-xl font-bold tracking-tight text-ink lg:text-2xl">Featured in {{ $city->name }}</h2>
-                <div class="business-list mt-5">
+                <div class="business-list no-tint mt-5">
                     @foreach ($featured as $business)
                         <x-business-card :business="$business" />
                     @endforeach
